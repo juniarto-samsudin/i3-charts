@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        TESTER = document.getElementById("myDiv")
+
+
+
+ {# var timeseries =
+  {
+    x: ['2013-10-04 22:23:00', '2013-10-04 23:23:00', '2013-12-04 22:23:00'],
+    y: {{ mydata }},
+    type: 'scatter'
+  }#}
+ var setPoint =
+  {
+    x: {{ dateTime | safe }},
+    y: {{ setPoint|safe }},
+    name: 'set point',
+    type: 'scatter'
+  }
+
+
+var lowerLimit =
+  {
+    x: {{ dateTime | safe }},
+    y: {{ lowerLimit|safe }},
+    name: 'lower value',
+    type: 'scatter'
+  }
+
+  var upperLimit =
+  {
+    x: {{ dateTime | safe }},
+    y: {{ upperLimit|safe }},
+    name: 'upper value',
+    type: 'scatter'
+  }
+
+  var readValue=
+      {
+          x: {{ dateTime | safe }},
+          y: {{ readValue|safe }},
+          name: 'temp value',
+          type: 'scatter'
+      }
+
+        var data = [readValue, upperLimit, lowerLimit,setPoint]
+
+axis_template={
+    showline: showline = true,
+    showgrid: showgrid = true,
+    nticks: nticks = 20
+}
+
+var layout = {
+            title:'Temperature',
+            yaxis:{
+                autorange: true,
+                range: [200.00, 140.00],
+                type: 'linear',
+                showline: showline = true,
+                showgrid: showgrid = true,
+                nticks: nticks =6
+            }
+}
+
+var config = {responsive: true}
+Plotly.newPlot(TESTER, data, layout, config)
+
+      </script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        TESTER = document.getElementById("myDiv")
+
+        var readValue={
+            x: {{  readValue|safe }},
+            type: 'histogram'
+        }
+
+        var data = [readValue]
+        var layout ={
+            title:'Temperature Histogram'
+        }
+        var config = {responsive: true}
+        Plotly.newPlot(TESTER, data,layout, config)
+    </script>
+{% endblock %}
