@@ -1,0 +1,39 @@
+
+
+{% extends "base.html" %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        TESTER = document.getElementById("myDiv")
+
+
+    var trace1 = {
+  x: [1, 2, 3, 4],
+  y: [10, 15, 13, 17],
+  mode: 'markers'
+};
+
+        var trace2 = {
+  x: [2, 3, 4, 5],
+  y: [16, 5, 11, 9],
+  mode: 'lines'
+};
+var trace3 = {
+  x: [1, 2, 3, 4],
+  y: [12, 9, 15, 12],
+  mode: 'lines+markers'
+};
+
+        var data = [trace1, trace2, trace3]
+
+
+var layout = {
+            title:'Line and Scatter Plot'
+}
+
+var config = {responsive: true}
+Plotly.newPlot(TESTER, data, layout, config)
+
+      </script>
+{% endblock %}
