@@ -27,6 +27,28 @@ def readCsvFile(csvfile):
                 line_count += 1
     return dateTime, readValue,upperLimit,lowerLimit,setPoint
 
+def readTorquePower(csvfile):
+    readTime=[]
+    readDate=[]
+    dateTime=[]
+    readTorque=[]
+    readPower=[]
+    with open(csvfile) as csvfile:
+        csv_reader = csv.reader(csvfile,delimiter=',')
+        line_count=0
+        for row in csv_reader:
+            if line_count == 0:
+                line_count += 1
+                continue
+            else:
+                readTime.append(row[0])
+                readDate.append(row[1])
+                dateTime.append(convertDateTime(row[0], row[1]))
+                readTorque.append(row[2])
+                readPower.append(row[3])
+                line_count += 1
+    return dateTime,readTorque,readPower
+
 def convertDateTime(readTime, readDate):
     myTime = readTime
     myYear = readDate[0:4]

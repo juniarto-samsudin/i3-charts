@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Line Chart{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        TESTER = document.getElementById("myDiv")
+        x = {{ dateTime | safe }}
+        yTorque = {{ readTorque|safe }}
+        yPower = {{  readPower|safe }}
+        chartTitle = {{ title|safe }}
+        new_x = x
+        new_yTorque = yTorque
+        new_yPower = yPower
+        {% if starttime != None  and endtime != None %}
+            starttime = {{ starttime|safe }}
+            console.log("starttimeconsole: ", starttime)
+            endtime = {{ endtime|safe }}
+            console.log("endtimeconsole: ", endtime)
+
+            new_x = []
+            new_yTorque = []
+            new_yPower = []
+            for (var i = 0; i < x.length; i++){
+                if (x[i] >= starttime && x[i] < endtime ){
+                        new_x.push(x[i])
+                        new_yTorque.push(yTorque[i])
+                        new_yPower.push(yPower[i])
+                }
+            }
+        {% endif %}
+        
+        var torque = {
+            x: new_x,
+            y: new_yTorque,
+            name: 'Torque',
+            type: 'scatter'
+        }
+
+        var power = {
+            x: new_x,
+            y: new_yPower,
+            name: 'Power',
+            type: 'scatter'
+        }
+
+        var data = [torque, power]
+
+axis_template={
+    showline: showline = true,
+    showgrid: showgrid = true,
+    nticks: nticks = 20
+}
+
+var layout = {
+            title: chartTitle,
+            yaxis:{
+                autorange: true,
+                range: [10.00, 25.00],
+                type: 'linear',
+                showline: showline = true,
+                showgrid: showgrid = true,
+                nticks: nticks =6
+            }
+}
+
+var config = {responsive: true, displaylogo:false}
+Plotly.newPlot(TESTER, data, layout, config)
+
+      </script>
+{% endblock %}

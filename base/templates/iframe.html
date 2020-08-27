@@ -2,12 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <title>IFRAME</title>
 </head>
 <body>
-<iframe src={{ url_for('lineApplication.default', table='testcsv') }} width="580" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
-<iframe src={{ url_for('boxApplication.default', table='testcsv') }} width="580" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
-<iframe src={{ url_for('spcApplication.default', table='testcsv') }} width="580" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
-<iframe src={{ url_for('histoApplication.default', table='testcsv') }} width="580" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<div class="container-fluid">
+    <div class="input-group mb-3">
+    <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">Machine Name</span>
+    </div>
+    <input id="mName" type="text" class="form-control" placeholder="fanuc" aria-label="Username" aria-describedby="basic-addon1">
+    </div>
+
+    <div class="input-group mb-3">
+    <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">Title</span>
+    </div>
+    <input id="title" type="text" class="form-control" placeholder="Torque and Power" aria-label="title" aria-describedby="basic-addon1">
+    </div>
+
+    <div class="input-group mb-3">
+    <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon2">Start Time</span>
+    </div>
+    <input id="startTime" type="text" class="form-control" placeholder="2020-07-24 15:30:01" aria-label="Start Time" aria-describedby="basic-addon2">
+    </div>
+
+    <div class="input-group mb-3">
+    <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon3">End Time</span>
+    </div>
+    <input id="endTime" type="text" class="form-control" placeholder="2020-07-24 15:30:01" aria-label="End Time" aria-describedby="basic-addon3">
+    </div>
+
+    <button type="button" class="btn btn-info" id="Submit">Get Chart</button>
+
+</div>
+
+<iframe id="mychart" src='http://127.0.0.1:5000/line/fanuc?title="Torque and Power"' width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+
+<!--
+<iframe src={{ url_for('lineApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<iframe src={{ url_for('boxApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<iframe src={{ url_for('spcApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<iframe src={{ url_for('histoApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+-->
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script>
+        $('#Submit').click(function(){
+            console.log($('#mName').val())
+            machinename = $('#mName').val()
+            starttime = $('#startTime').val()
+            endtime = $('#endTime').val()
+            title = $('#title').val()
+            console.log("TITLE: ", title)
+            src = "http://127.0.0.1:5000/line/" + machinename + '?' + 'starttime="' + starttime + '"&'
+                                                + 'endtime="' + endtime +'"&' + 'title="' + title +'"'
+            console.log(src)
+            $('#mychart').attr('src', src)
+        });
+    </script>
 </body>
 </html>
