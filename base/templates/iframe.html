@@ -40,8 +40,8 @@
 
 </div>
 
-<iframe id="mychart" src='http://127.0.0.1:5000/line/fanuc?title="Torque and Power"' width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
-
+<!--<iframe id="mychart" src='http://127.0.0.1:5000/line/fanuc?title="Torque and Power"' width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>-->
+<iframe id="mychart" src={{ url_for('lineApplication.default', table='fanuc', title='"Torque and Power"') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
 <!--
 <iframe src={{ url_for('lineApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
 <iframe src={{ url_for('boxApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
