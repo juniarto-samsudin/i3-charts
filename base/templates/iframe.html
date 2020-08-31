@@ -61,7 +61,9 @@
             endtime = $('#endTime').val()
             title = $('#title').val()
             console.log("TITLE: ", title)
-            src = "http://127.0.0.1:5000/line/" + machinename + '?' + 'starttime="' + starttime + '"&'
+            //src = "http://127.0.0.1:5000/line/" + machinename + '?' + 'starttime="' + starttime + '"&'
+            //                                    + 'endtime="' + endtime +'"&' + 'title="' + title +'"'
+            src = {{ url_for('lineApplication.default', table='') }}+ machinename + '?' + 'starttime="' + starttime + '"&'
                                                 + 'endtime="' + endtime +'"&' + 'title="' + title +'"'
             console.log(src)
             $('#mychart').attr('src', src)
