@@ -8,7 +8,7 @@
         x = {{ dateTime | safe }}
         yTorque = {{ readTorque|safe }}
         yPower = {{  readPower|safe }}
-        chartTitle = {{ title|safe }}
+        chartTitle = {{ title|safe|tojson }}
         new_x = x
         new_yTorque = yTorque
         new_yPower = yPower

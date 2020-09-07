@@ -5,6 +5,10 @@ lineApp = Blueprint("lineApplication", __name__, static_folder="static", templat
 
 @lineApp.route("/<table>")
 def default(table):
+    print(request.query_string.decode('utf-8'))
+    parameters=request.args.getlist("parameters")
+    print("PARAMETERS: ", parameters)
+    #example: http://127.0.0.1:5000/line/fanuc?title=juniarto&parameters=temperature&parameters=pressure&parameters=torque
     starttime = request.args.get('starttime')
     endtime = request.args.get('endtime')
     title = request.args.get('title')
