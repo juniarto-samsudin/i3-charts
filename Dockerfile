@@ -1,5 +1,5 @@
 FROM python:latest
-RUN pip install flask flask-blueprint waitress
+RUN pip install flask flask-blueprint waitress requests simplejson
 WORKDIR C:/app
 COPY i3-charts .
 #CMD ["flask", "run","--host=0.0.0.0"]
