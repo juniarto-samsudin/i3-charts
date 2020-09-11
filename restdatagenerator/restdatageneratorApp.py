@@ -7,6 +7,7 @@ restdatageneratorApp = Blueprint('restdatageneratorApplication', __name__)
 @restdatageneratorApp.route("/")
 def default():
     #mydata = '{machineName: fanuc,datetime: [2020-07-01 14:14:05, 2020-07-02 00:00:00, 2020-07-03 00:00:00, 2020-07-04 00:00:00],parameters: {temperature: [32, 33, 40, 70]}}'
+    print("INSIDE restdatageneratorApp")
     myData = {}
     parameters = {}
     temperatureList = generate_temperature()
