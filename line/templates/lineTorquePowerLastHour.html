@@ -94,8 +94,7 @@ Plotly.newPlot(ROOT, data, layout, config)#}
     }
 
     function reRender(){
-            //myurl={{ url_for('restdatageneratorApplication.default') }}
-            myurl= 'http://127.0.0.1:5000' + {{ url_for('restdatageneratorApplication.default') }}
+            myurl={{ url_for('restdatageneratorApplication.default') }}
             console.log("MYURL: ", myurl)
             $.ajax({
                 type: "GET",
