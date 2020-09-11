@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Line Chart{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        ROOT = document.getElementById("myDiv")
+        resp = JSON.parse({{ response |tojson| safe }})
+        chartTitle = {{ title|safe|tojson }}
+        freq = {{ freq|tojson|safe }}
+        console.log("MACHINENAME: ", resp.machineName)
+        console.log("DATETIME: ", resp.datetime)
+        console.log("FREQ: ", freq)
+
+        //GET PARAMETERS KEY
+        listKeyParameter = getListOfKeyParameter(resp.parameters)
+
+        //var keyParameter = new Array()
+        //for (var i in resp.parameters){
+        //    var key = i;
+        //    keyParameter.push(key)
+        //    console.log("KEY: ", key) //temperature
+        //}
+        //console.log(listKeyParameter[0]) //temperature
+        //console.log(resp.parameters[listKeyParameter[0]]) //array of temperature
+
+        drawChart(resp.datetime, resp.parameters[listKeyParameter[0]])
+{#        var temperature = {
+            x: resp.datetime,
+            y: resp.parameters[listKeyParameter[0]],
+            name: 'temperature',
+            type: 'scatter'
+        }
+
+
+        var data = [temperature]
+
+axis_template={
+    showline: showline = true,
+    showgrid: showgrid = true,
+    nticks: nticks = 20
+}
+
+var layout = {
+            title: chartTitle,
+            yaxis:{
+                autorange: true,
+                range: [10.00, 250.00],
+                type: 'linear',
+                showline: showline = true,
+                showgrid: showgrid = true,
+                nticks: nticks =6
+            }
+}
+
+var config = {responsive: true, displaylogo:false}
+Plotly.newPlot(ROOT, data, layout, config)#}
+
+    function drawChart(chartDateTime,chartParameter){
+            var temperature = {
+                x: chartDateTime,
+                y: chartParameter,
+                name: 'temperature',
+                type: 'scatter'
+            }
+
+            var data = [temperature]
+
+            var layout = {
+                title: chartTitle,
+                yaxis: {
+                    autorange: true,
+                    range: [10.00, 250.00],
+                    type: 'linear',
+                    showline: showline = true,
+                    showgrid: showgrid = true,
+                    nticks: nticks = 6
+                }
+            }
+
+            var config = {responsive: true, displaylogo:false}
+            Plotly.newPlot(ROOT, data, layout, config)
+    }
+
+
+    function getListOfKeyParameter(respParameters){
+            var keyParameter = new Array()
+            for (var i in resp.parameters){
+                var key = i;
+                keyParameter.push(key)
+                console.log("KEY: ", key) //temperature
+            }
+            return keyParameter
+    }
+
+    function reRender(){
+            myurl={{ url_for('restdatageneratorApplication.default') }}
+            $.ajax({
+                type: "GET",
+                url: myurl,
+                dataType: 'json'
+            }).done(function(jsondata, status, xhr){
+                console.log("RESPONSE: ", jsondata);
+                console.log("MachineName: ", jsondata.machineName)
+                listKeyParameter = getListOfKeyParameter(jsondata.parameters)
+                temperatureArray = jsondata.parameters[listKeyParameter[0]]
+                dateArray = jsondata.datetime
+                console.log("temperatureArray: ", temperatureArray)
+                console.log("dateArray: ", dateArray)
+                drawChart(dateArray,temperatureArray)
+                setTimeout(reRender,freq)
+            }).fail(function(xhr, status, error){
+                console.log("AJAX FAILED")
+            })
+    }
+
+    reRender()
+
+      </script>
+{% endblock %}

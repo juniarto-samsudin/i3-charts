@@ -8,6 +8,8 @@
 </head>
 <body>
 <div class="container-fluid">
+    <div class="row">
+    <div class="col-6">
     <div class="input-group mb-3">
     <div class="input-group-prepend">
     <span class="input-group-text" id="basic-addon1">Machine Name</span>
@@ -37,16 +39,54 @@
     </div>
 
     <button type="button" class="btn btn-info" id="Submit">Get Chart</button>
+    </div>
+    <div class="col-6">
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Machine Name</span>
+        </div>
+        <input id="mName2" type="text" class="form-control" placeholder="fanuc" aria-label="Username" aria-describedby="basic-addon1">
+        </div>
 
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Title</span>
+        </div>
+        <input id="title2" type="text" class="form-control" placeholder="Torque and Power" aria-label="title" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon2">Last Hour</span>
+        </div>
+        <input id="lasthours" type="text" class="form-control" placeholder="3" aria-label="Last x Hour" aria-describedby="basic-addon2">
+        </div>
+
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon2">Freq</span>
+        </div>
+        <input id="freq" type="text" class="form-control" placeholder="3" aria-label="Last x Hour" aria-describedby="basic-addon2">
+        </div>
+
+        <button type="button" class="btn btn-info" id="Submit2">Get Chart</button>
+    </div>
+    </div>
 </div>
 
 <!--<iframe id="mychart" src='http://127.0.0.1:5000/line/fanuc?title="Torque and Power"' width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>-->
-<iframe id="mychart" src={{ url_for('lineApplication.default', table='fanuc', title='Torque and Power') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<div class="container-fluid">
+<div class="row">
+<div class="col">
+<iframe id="mychart" src={{ url_for('lineApplication.default', machinename='fanuc', title='Torque and Power') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+</div>
+</div>
+</div>
 <!--
-<iframe src={{ url_for('lineApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
-<iframe src={{ url_for('boxApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
-<iframe src={{ url_for('spcApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
-<iframe src={{ url_for('histoApplication.default', table='testcsv') }} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<iframe src={#  {{ url_for('lineApplication.default', machinename='testcsv') }} #} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<iframe src={#  {{ url_for('boxApplication.default', machinename='testcsv') }} #}width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<iframe src={#  {{ url_for('spcApplication.default', machinename='testcsv') }} #} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
+<iframe src={#  {{ url_for('histoApplication.default', machinename='testcsv') }} #} width="780" height="580" frameborder="0" allowtransparency="true" name="example"></iframe><br>
 -->
 <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -63,11 +103,28 @@
             console.log("TITLE: ", title)
             //src = "http://127.0.0.1:5000/line/" + machinename + '?' + 'starttime="' + starttime + '"&'
             //                                    + 'endtime="' + endtime +'"&' + 'title="' + title +'"'
-            src = {{ url_for('lineApplication.default', table='') }}+ machinename + '?' + 'starttime="' + starttime + '"&'
+            src = {{ url_for('lineApplication.default', machinename='') }}+ machinename + '?' + 'starttime="' + starttime + '"&'
                                                 + 'endtime="' + endtime +'"&' + 'title="' + title +'"'
             console.log(src)
             $('#mychart').attr('src', src)
         });
+
+        $('#Submit2').click(function(){
+            console.log($('#mName2').val())
+            machinename = $('#mName2').val()
+            lasthours = $('#lasthours').val()
+            title = $('#title2').val()
+            freq = $('#freq').val()
+            console.log("TITLE: ", title)
+            //src = "http://127.0.0.1:5000/line/" + machinename + '?' + 'starttime="' + starttime + '"&'
+            //                                    + 'endtime="' + endtime +'"&' + 'title="' + title +'"'
+            //http://127.0.0.1:5000/line/fanuc?lasthours=3&title=temperature&freq=5000
+            src = {{ url_for('lineApplication.default', machinename='') }}+ machinename + '?' + 'lasthours="' + lasthours + '"&' + 'freq=' + freq + '&' + 'title="' + title +'"'
+            console.log(src)
+            $('#mychart').attr('src', src)
+        });
+
+
     </script>
 </body>
 </html>
