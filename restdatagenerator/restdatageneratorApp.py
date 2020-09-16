@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from restdatagenerator.util import generate_temperature,generate_date, response
+from restdatagenerator.util import generate_temperature,generate_date, response, generate_lowerLimit, generate_upperLimit
 import simplejson as json
 
 restdatageneratorApp = Blueprint('restdatageneratorApplication', __name__)
@@ -12,10 +12,14 @@ def default():
     parameters = {}
     temperatureList = generate_temperature()
     datelist = generate_date()
+    upperLimitList = generate_upperLimit()
+    lowerLimitList = generate_lowerLimit()
     parameters['temperature'] = temperatureList
     myData['parameters'] = parameters
     myData['datetime'] = datelist
     myData['machineName'] = "fanuc"
+    myData['upperLimit'] = upperLimitList
+    myData['lowerLimit'] = lowerLimitList
     #return jsonify(myData)
     #return json.dumps(myData)
     return response(myData)

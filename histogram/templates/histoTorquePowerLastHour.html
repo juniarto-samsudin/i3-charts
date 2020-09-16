@@ -17,31 +17,25 @@
         parameterName = listKeyParameter[0]
         drawChart(resp.datetime, resp.parameters[listKeyParameter[0]])
 
+
         function drawChart(chartDateTime,chartParameter){
             var parameter = {
-                x: chartDateTime,
+                //x: chartDateTime,
                 y: chartParameter,
                 name: parameterName,
-                type: 'scatter'
+                type: 'histogram'
             }
 
             var data = [parameter]
 
             var layout = {
-                title: chartTitle,
-                yaxis: {
-                    autorange: true,
-                    range: [10.00, 250.00],
-                    type: 'linear',
-                    showline: showline = true,
-                    showgrid: showgrid = true,
-                    nticks: nticks = 6
-                }
+                title: chartTitle
             }
 
             var config = {responsive: true, displaylogo:false}
             Plotly.newPlot(ROOT, data, layout, config)
         }
+
 
         function getListOfKeyParameter(respParameters){
             var keyParameter = new Array()
@@ -77,5 +71,5 @@
 
         reRender()
 
-      </script>
+    </script>
 {% endblock %}

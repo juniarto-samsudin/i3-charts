@@ -11,13 +11,15 @@
         console.log("MACHINENAME: ", resp.machineName)
         console.log("DATETIME: ", resp.datetime)
         console.log("FREQ: ", freq)
-
+        console.log("UPPERLIMIT: ", resp.upperLimit)
+        console.log("LOWERLIMIT: ", resp.lowerLimit)
         //GET PARAMETERS KEY
         listKeyParameter = getListOfKeyParameter(resp.parameters)
         parameterName = listKeyParameter[0]
-        drawChart(resp.datetime, resp.parameters[listKeyParameter[0]])
+        drawChart(resp.datetime, resp.parameters[listKeyParameter[0]], resp.upperLimit, resp.lowerLimit)
 
-        function drawChart(chartDateTime,chartParameter){
+
+        function drawChart(chartDateTime,chartParameter, upperLimit, lowerLimit){
             var parameter = {
                 x: chartDateTime,
                 y: chartParameter,
@@ -25,23 +27,75 @@
                 type: 'scatter'
             }
 
-            var data = [parameter]
+            var upperLimitLine = {
+                x: chartDateTime,
+                y: upperLimit,
+                name: 'LCL/UCL',
+                type: 'scatter',
+                line:{
+                    color: 'red',
+                    width: 2,
+                    dash: 'dash'
+                }
+            }
+
+            var lowerLimitLine = {
+                x: chartDateTime,
+                y: lowerLimit,
+                name: 'LCL/UCL',
+                type: 'scatter',
+                line:{
+                    color: 'red',
+                    width: 2,
+                    dash: 'dash'
+                }
+            }
+
+            var histo = {
+                type: 'histogram',
+                //x: chartDateTime,
+                y: chartParameter,
+                name: 'Distribution',
+                orientation: 'h',
+                marker: {
+                    color: 'blue',
+                    line: {
+                        color: 'white',
+                        width: 1
+                    }
+                },
+                xaxis: 'x2',
+                yaxis: 'y2'
+            }
+
+
+            var data = [parameter, upperLimitLine, lowerLimitLine, histo]
 
             var layout = {
                 title: chartTitle,
+                xaxis: {
+                    domain: [0, 0.7], // 0 to 70% of width
+                    zeroline: false
+                },
                 yaxis: {
-                    autorange: true,
-                    range: [10.00, 250.00],
-                    type: 'linear',
-                    showline: showline = true,
-                    showgrid: showgrid = true,
-                    nticks: nticks = 6
+                    range: [50,200],
+                    zeroline: false
+                },
+                xaxis2: {
+                domain: [0.8, 1] // 70 to 100% of width
+                },
+                yaxis2: {
+                    anchor: 'x2',
+                    showticklabels: true
                 }
+
+
             }
 
             var config = {responsive: true, displaylogo:false}
             Plotly.newPlot(ROOT, data, layout, config)
         }
+
 
         function getListOfKeyParameter(respParameters){
             var keyParameter = new Array()
@@ -66,9 +120,11 @@
                 listKeyParameter = getListOfKeyParameter(jsondata.parameters)
                 parameterArray = jsondata.parameters[listKeyParameter[0]]
                 dateArray = jsondata.datetime
+                upperLimit = jsondata.upperLimit
+                lowerLimit = jsondata.lowerLimit
                 console.log("temperatureArray: ", parameterArray)
                 console.log("dateArray: ", dateArray)
-                drawChart(dateArray,parameterArray)
+                drawChart(dateArray,parameterArray,upperLimit,lowerLimit)
                 setTimeout(reRender,freq)
             }).fail(function(xhr, status, error){
                 console.log("AJAX FAILED")
@@ -77,5 +133,5 @@
 
         reRender()
 
-      </script>
+    </script>
 {% endblock %}

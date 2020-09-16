@@ -38,21 +38,21 @@
     }
 
 
-var lowerLimit =
+{#var lowerLimit =
   {
     x: {{ dateTime | safe }},
     y: {{ lowerLimit|safe }},
     name: 'lower value',
     type: 'scatter'
-  }
+  }#}
 
-  var upperLimit =
+{#  var upperLimit =
   {
     x: {{ dateTime | safe }},
     y: {{ upperLimit|safe }},
     name: 'upper value',
     type: 'scatter'
-  }
+  }#}
 
   var histo = {
     type: 'histogram',
@@ -100,11 +100,11 @@ var layout = {
             },
             xaxis2: {
                 domain: [0.8, 1] // 70 to 100% of width
-            },
-            yaxis2: {
-                anchor: 'x2',
-                showticklabels: false
-            }
+                },
+             yaxis2: {
+                    anchor: 'x2',
+                    showticklabels: true
+                }
 }
 
 var config = {responsive: true, displaylogo: false}

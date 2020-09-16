@@ -27,6 +27,20 @@ def formatTime(time):
     stringTime = time.strftime("%Y-%m-%d %H:%M:%S")
     return stringTime
 
+def generate_upperLimit():
+    upperLimitList = []
+    for _ in range(180):
+        upperLimit = 170
+        upperLimitList.append(upperLimit)
+    return upperLimitList
+
+def generate_lowerLimit():
+    lowerLimitList = []
+    for _ in range(180):
+        lowerLimit = 80
+        lowerLimitList.append(lowerLimit)
+    return lowerLimitList
+
 # build a Json response
 def response( data ):
     return Response( response=json.dumps(data),
