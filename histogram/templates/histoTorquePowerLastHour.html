@@ -11,17 +11,20 @@
         console.log("MACHINENAME: ", resp.machineName)
         console.log("DATETIME: ", resp.datetime)
         console.log("FREQ: ", freq)
+        console.log("STDDEV: ", resp.stdDev)
 
         //GET PARAMETERS KEY
         listKeyParameter = getListOfKeyParameter(resp.parameters)
         parameterName = listKeyParameter[0]
-        drawChart(resp.datetime, resp.parameters[listKeyParameter[0]])
+        drawChart(resp.datetime, resp.parameters[listKeyParameter[0]], resp.stdDev)
 
 
-        function drawChart(chartDateTime,chartParameter){
+        function drawChart(chartDateTime,chartParameter,stdDev){
             var parameter = {
                 //x: chartDateTime,
-                y: chartParameter,
+                x: chartParameter,
+                autobinx: false,
+                xbins: {size:stdDev},
                 name: parameterName,
                 type: 'histogram'
             }
@@ -60,9 +63,10 @@
                 listKeyParameter = getListOfKeyParameter(jsondata.parameters)
                 parameterArray = jsondata.parameters[listKeyParameter[0]]
                 dateArray = jsondata.datetime
+                stdDev = jsondata.stdDev
                 console.log("temperatureArray: ", parameterArray)
                 console.log("dateArray: ", dateArray)
-                drawChart(dateArray,parameterArray)
+                drawChart(dateArray,parameterArray,stdDev)
                 setTimeout(reRender,freq)
             }).fail(function(xhr, status, error){
                 console.log("AJAX FAILED")

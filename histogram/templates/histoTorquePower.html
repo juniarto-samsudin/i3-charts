@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Line Chart{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        TESTER = document.getElementById("myDiv")
+        x = {{ dateTime | safe }}
+        yTorque = {{ readTorque|safe }}
+        yPower = {{  readPower|sort|safe }}
+        torqueStdDev = {{ torqueStdDev|safe }}
+        powerStdDev = {{ powerStdDev|safe }}
+        torqueMean = {{ torqueMean|safe }}
+        powerMean = {{ powerMean|safe }}
+        zScorePower = {{ zScorePower|safe }}
+        chartTitle = {{ title|safe|tojson }}
+        titlex = {{ titlex|safe|tojson }}
+        titley = {{ titley|safe|tojson }}
+        xNormalDistribution = {{ xList|safe }}
+        yNormalDistribution = {{ yList|safe }}
+        new_x = x
+        new_yTorque = yTorque
+        new_yPower = yPower
+        {% if starttime != None  and endtime != None %}
+            starttime = {{ starttime|safe }}
+            console.log("starttimeconsole: ", starttime)
+            endtime = {{ endtime|safe }}
+            console.log("endtimeconsole: ", endtime)
+
+            new_x = []
+            new_yTorque = []
+            new_yPower = []
+            for (var i = 0; i < x.length; i++){
+                if (x[i] >= starttime && x[i] < endtime ){
+                        new_x.push(x[i])
+                        new_yTorque.push(yTorque[i])
+                        new_yPower.push(yPower[i])
+                }
+            }
+        {% endif %}
+        
+        var torque = {
+            x: new_x,
+            y: new_yTorque,
+            name: 'Torque',
+            type: 'histogram'
+        }
+
+        var power = {
+            x: yPower,
+            autobinx: false,
+            xbins:{size: powerStdDev},
+            //xaxis:'xaxis',
+            //y: new_yPower,
+            name: 'Power',
+            type: 'histogram'
+        }
+
+
+
+        var powerStdNormalDistribution = {
+            x: yPower,
+            y: zScorePower,
+            type:'scatter'
+        }
+
+        var normaldistribution = {
+            x: xNormalDistribution,
+            y: yNormalDistribution,
+            yaxis:'y2',
+            xaxis: 'x',
+            type:'scatter'
+        }
+
+        var data = [power, normaldistribution]
+
+{#
+axis_template={
+    showline: showline = false,
+    showgrid: showgrid = false,
+    nticks: nticks = 20
+}
+#}
+
+var layout = {
+            title: chartTitle,
+            //barmode: "overlay",
+            bargroupgap: 0.05,
+            //bargap: 0.05,
+            yaxis:{
+                title: titley,
+                autorange: true,
+                //range: [-5.00, 5.00],
+                type: 'linear',
+                showline: showline = false,
+                showgrid: showgrid = false,
+                nticks: nticks =6,
+            },
+            yaxis2:{
+                side: 'right',
+                autorange: true,
+                overlaying: 'y',
+                showline: showline = false,
+                showgrid: showgrid = false,
+                zeroline: false
+            },
+            xaxis:{
+                title: titlex,
+                //showgrid: showgrid = false,
+                showline: showline = false,
+            }
+            {#annotations: [
+    {
+      x: 25,
+      y: 2000,
+      //xref: 'x',
+      //yref: 'y',
+      text: 'stddev: ' +  powerStdDev  +  ' mean: ' + powerMean ,
+      showarrow: false,
+      //arrowhead: 7,
+      //ax: 0,
+      //ay: -40
+    }
+  ]#}
+}
+
+var config = {responsive: true, displaylogo:false}
+Plotly.newPlot(TESTER, data, layout, config)
+
+      </script>
+{% endblock %}

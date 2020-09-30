@@ -1,4 +1,8 @@
 import csv
+import statistics
+import math
+import scipy.stats
+
 
 def readCsvFile(csvfile):
     readTime=[]
@@ -26,6 +30,73 @@ def readCsvFile(csvfile):
                 setPoint.append(row[5])
                 line_count += 1
     return dateTime, readValue,upperLimit,lowerLimit,setPoint
+
+def readTorquePower(csvfile):
+    readTime=[]
+    readDate=[]
+    dateTime=[]
+    readTorque=[]
+    readPower=[]
+    zScorePower=[]
+    with open(csvfile) as csvfile:
+        csv_reader = csv.reader(csvfile,delimiter=',')
+        line_count=0
+        for row in csv_reader:
+            if line_count == 0:
+                line_count += 1
+                continue
+            else:
+                readTime.append(row[0])
+                readDate.append(row[1])
+                dateTime.append(convertDateTime(row[0], row[1]))
+                readTorque.append(float(row[2]))
+                readPower.append(float(row[3]))
+                line_count += 1
+        print("readtorque: ", readTorque)
+        print("readpower: ", readPower)
+        print("readpowersort: ", sorted(readPower))
+        torqueStdDev = math.floor(statistics.pstdev(readTorque))
+        powerStdDev = math.floor(statistics.pstdev(readPower))
+        torqueMean = statistics.mean(readTorque)
+        powerMean = statistics.mean(readPower)
+        xList, yList = genNormalCurve(readPower)
+        print("xList.length = ", len(xList))
+        print("yList.length = ", len(yList))
+        print("xList : ", xList)
+        print("yList : ", yList)
+        for power in sorted(readPower):
+            zScoreValue = zScore(power, powerMean, powerStdDev)
+            zScorePower.append(zScoreValue)
+    return dateTime,readTorque,readPower,torqueStdDev,powerStdDev, torqueMean, powerMean, zScorePower, xList, yList
+
+
+def zScore(x,mean,std):
+    zScore = (x - mean)/std
+    return zScore
+
+def calcStdDev(data):
+    return statistics.stdev(data)
+
+def calcMean(data):
+    return statistics.mean(data)
+
+def genNormalCurve(data):
+    #X-Axis
+    xStart = calcMean(data) - 3*calcStdDev(data)
+    xInc = 6*calcStdDev(data)/100 #100 points curve
+    xList = []
+    xList.append(xStart)
+    count  = 0
+    while count < 100:
+        temp = xList[count] + xInc
+        xList.append(temp)
+        count = count + 1
+    #Y-Axis
+    yList = []
+    for x in xList:
+        temp = scipy.stats.norm(calcMean(data), calcStdDev(data)).pdf(x)
+        yList.append(temp)
+    return xList, yList
 
 def convertDateTime(readTime, readDate):
     myTime = readTime

@@ -16,6 +16,9 @@ app.register_blueprint(baseApp, url_prefix="/base")
 app.register_blueprint(spcApp, url_prefix="/spc")
 app.register_blueprint(restdatageneratorApp,url_prefix="/restdatagenerator")
 
+app.config.from_object("config.ProductionConfig")
+print(app.config["DB_NAME"])
+
 @app.route('/')
 def default():
     dateTime, readValue,upperLimit, lowerLimit, setPoint = readCsvFile('temperature.csv')

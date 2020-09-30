@@ -10,7 +10,7 @@ def default():
     print("INSIDE restdatageneratorApp")
     myData = {}
     parameters = {}
-    temperatureList = generate_temperature()
+    temperatureList, stdDev = generate_temperature()
     datelist = generate_date()
     upperLimitList = generate_upperLimit()
     lowerLimitList = generate_lowerLimit()
@@ -20,6 +20,7 @@ def default():
     myData['machineName'] = "fanuc"
     myData['upperLimit'] = upperLimitList
     myData['lowerLimit'] = lowerLimitList
+    myData['stdDev'] = stdDev
     #return jsonify(myData)
     #return json.dumps(myData)
     return response(myData)

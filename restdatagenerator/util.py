@@ -3,13 +3,16 @@ from random import randint
 import datetime
 from flask  import Response
 import simplejson as json
+import statistics
+import math
 
 def generate_temperature():
     tempList = []
     for _ in range(180):
         temp = randint(100,150)
         tempList.append(temp)
-    return tempList
+    stdDev = math.floor(statistics.pstdev(tempList))
+    return tempList,stdDev
 
 def generate_date():
     now = datetime.datetime.now()
