@@ -10,10 +10,11 @@
         powerStdDev = {{ powerStdDev|safe }}
         xNormalDistribution = {{ xList|safe }}
         yNormalDistribution = {{ yList|safe }}
+        setPointValue = x.map(xItem =>{return 20})
         var setPoint =
             {
                 x: x,
-                y: 20,
+                y: setPointValue,
                 name: 'set point',
                 type: 'scatter'
             }
