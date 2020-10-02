@@ -23,7 +23,7 @@ def readCsvFile(csvfile):
                 readTime.append(row[0])
                 readDate.append(row[1])
                 dateTime.append(convertDateTime(row[0],row[1]))
-                print ("DATETIME:", dateTime)
+                #print ("DATETIME:", dateTime)
                 readValue.append(row[2])
                 upperLimit.append(row[3])
                 lowerLimit.append(row[4])
@@ -37,7 +37,6 @@ def readTorquePower(csvfile):
     dateTime=[]
     readTorque=[]
     readPower=[]
-    zScorePower=[]
     with open(csvfile) as csvfile:
         csv_reader = csv.reader(csvfile,delimiter=',')
         line_count=0
@@ -52,27 +51,19 @@ def readTorquePower(csvfile):
                 readTorque.append(float(row[2]))
                 readPower.append(float(row[3]))
                 line_count += 1
-        print("readtorque: ", readTorque)
-        print("readpower: ", readPower)
-        print("readpowersort: ", sorted(readPower))
-        torqueStdDev = math.floor(statistics.pstdev(readTorque))
-        powerStdDev = math.floor(statistics.pstdev(readPower))
-        torqueMean = statistics.mean(readTorque)
-        powerMean = statistics.mean(readPower)
+        #print("readtorque: ", readTorque)
+        #print("readpower: ", readPower)
+        #print("readpowersort: ", sorted(readPower))
+        torqueStdDev = math.floor(calcStdDev(readTorque))
+        powerStdDev = math.floor(calcStdDev(readPower))
+        torqueMean = calcMean(readTorque)
+        powerMean = calcMean(readPower)
         xList, yList = genNormalCurve(readPower)
-        print("xList.length = ", len(xList))
-        print("yList.length = ", len(yList))
-        print("xList : ", xList)
-        print("yList : ", yList)
-        for power in sorted(readPower):
-            zScoreValue = zScore(power, powerMean, powerStdDev)
-            zScorePower.append(zScoreValue)
-    return dateTime,readTorque,readPower,torqueStdDev,powerStdDev, torqueMean, powerMean, zScorePower, xList, yList
-
-
-def zScore(x,mean,std):
-    zScore = (x - mean)/std
-    return zScore
+        #print("xList.length = ", len(xList))
+        #print("yList.length = ", len(yList))
+        #print("xList : ", xList)
+        #print("yList : ", yList)
+    return dateTime,readTorque,readPower,torqueStdDev,powerStdDev, torqueMean, powerMean, xList, yList
 
 def calcStdDev(data):
     return statistics.stdev(data)

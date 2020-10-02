@@ -32,12 +32,12 @@ def default(machinename):
         print("x:", dateTime[0])
         return render_template('histopage.html', readValue=readValue)
     elif (machinename == 'fanuc'):
-        dateTime, readTorque, readPower, torqueStdDev, powerStdDev, torqueMean, powerMean, zScorePower, xList, yList = readTorquePower('fanuc-torque-power.csv')
+        dateTime, readTorque, readPower, torqueStdDev, powerStdDev, torqueMean, powerMean,xList, yList = readTorquePower('fanuc-torque-power.csv')
         print("torquestddev: ", torqueStdDev)
         print("powerstddev: ", powerStdDev )
         print("torquemean: ", torqueMean)
         print("powermean: ", powerMean)
-        return render_template('histoTorquePower.html', dateTime=dateTime, readTorque=readTorque, readPower=readPower, torqueStdDev=torqueStdDev, powerStdDev=powerStdDev, torqueMean=torqueMean, powerMean=powerMean, zScorePower=zScorePower, title=title, titlex=titlex, titley=titley,xList=xList, yList=yList, starttime=starttime, endtime=endtime)
+        return render_template('histoTorquePower.html', dateTime=dateTime, readTorque=readTorque, readPower=readPower, torqueStdDev=torqueStdDev, powerStdDev=powerStdDev, torqueMean=torqueMean, powerMean=powerMean, title=title, titlex=titlex, titley=titley,xList=xList, yList=yList, starttime=starttime, endtime=endtime)
     else:
         return render_template('tableNotFound.html')
 @histoApp.route("/duration/<machinename>")

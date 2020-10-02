@@ -12,7 +12,6 @@
         powerStdDev = {{ powerStdDev|safe }}
         torqueMean = {{ torqueMean|safe }}
         powerMean = {{ powerMean|safe }}
-        zScorePower = {{ zScorePower|safe }}
         chartTitle = {{ title|safe|tojson }}
         titlex = {{ titlex|safe|tojson }}
         titley = {{ titley|safe|tojson }}
@@ -56,20 +55,13 @@
             type: 'histogram'
         }
 
-
-
-        var powerStdNormalDistribution = {
-            x: yPower,
-            y: zScorePower,
-            type:'scatter'
-        }
-
         var normaldistribution = {
             x: xNormalDistribution,
             y: yNormalDistribution,
             yaxis:'y2',
             xaxis: 'x',
-            type:'scatter'
+            type:'scatter',
+            name: 'Normal Distribution'
         }
 
         var data = [power, normaldistribution]
@@ -92,7 +84,7 @@ var layout = {
                 autorange: true,
                 //range: [-5.00, 5.00],
                 type: 'linear',
-                showline: showline = false,
+                showline: showline = true,
                 showgrid: showgrid = false,
                 nticks: nticks =6,
             },
@@ -100,7 +92,7 @@ var layout = {
                 side: 'right',
                 autorange: true,
                 overlaying: 'y',
-                showline: showline = false,
+                showline: showline = true,
                 showgrid: showgrid = false,
                 zeroline: false
             },
@@ -108,20 +100,20 @@ var layout = {
                 title: titlex,
                 //showgrid: showgrid = false,
                 showline: showline = false,
-            }
-            {#annotations: [
+            },
+            annotations: [
     {
       x: 25,
       y: 2000,
       //xref: 'x',
-      //yref: 'y',
+      yref: 'y',
       text: 'stddev: ' +  powerStdDev  +  ' mean: ' + powerMean ,
       showarrow: false,
       //arrowhead: 7,
       //ax: 0,
       //ay: -40
     }
-  ]#}
+  ]
 }
 
 var config = {responsive: true, displaylogo:false}
