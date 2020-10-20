@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}SPC Chart and Distribution{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        ROOT = document.getElementById("myDiv")
+        x = {{ dateTime | safe }}
+        plotParameter = {{ plotParameter|safe }}
+        envparameter = "{{ envparameter|safe }}"
+        StdDev = {{ StdDev|safe }}
+        xNormalDistribution = {{ xNormalDistList|safe }}
+        yNormalDistribution = {{ yNormalDistList|safe }}
+        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+        lcl = {{  lcl|safe }}
+        ucl = {{  ucl|safe }}
+        title = "{{  title|safe }}"
+        ylabel = "{{ ylabel|safe }}"
+        var setPoint =
+            {
+                x: x,
+                y: setPointValue,
+                name: 'set point',
+                type: 'scatter'
+            }
+        var CL =
+            {
+                type: 'scatter',
+                //x: ['2020-07-24 14:10:05','2020-07-24 14:30:05',null, '2020-07-24 14:10:05','2020-07-24 14:30:05'],
+                x:[x[0], x[x.length -1], null, x[0],x[x.length -1]],
+                y: [lcl, lcl,null, ucl, ucl],
+                mode: 'lines',
+                name: 'LCL/UCL',
+                showlegend: true,
+                line: {
+                    color: 'red',
+                    width: 2,
+                    dash: 'dash'
+                }
+            }
+
+{#var lowerLimit =
+  {
+    x: {{ dateTime | safe }},
+    y: {{ lowerLimit|safe }},
+    name: 'lower value',
+    type: 'scatter'
+  }#}
+
+{#  var upperLimit =
+  {
+    x: {{ dateTime | safe }},
+    y: {{ upperLimit|safe }},
+    name: 'upper value',
+    type: 'scatter'
+  }#}
+
+        var histo =
+            {
+                type: 'histogram',
+                {#x: {{ dateTime | safe }},#}
+                y: plotParameter,
+                autobiny: false,
+                ybins:{size: StdDev},
+                name: 'Distribution',
+                orientation: 'h',
+                marker: {
+                    color: 'blue',
+                    line: {
+                        color: 'white',
+                        width: 1
+                    }
+                },
+                xaxis: 'x2',
+                yaxis: 'y2'
+            }
+
+        var readValue=
+            {
+                x: x,
+                y: plotParameter,
+                name: envparameter,
+                type: 'scatter'
+            }
+
+        var normaldistribution = {
+            y: xNormalDistribution, //standard-deviation
+            x: yNormalDistribution, //normal-distribution
+            yaxis:'y2',
+            xaxis: 'x3',
+            type:'scatter',
+            name: 'Normal Distribution'
+        }
+
+
+        var data = [readValue, CL, setPoint,normaldistribution,  histo]
+
+
+        axis_template={
+            showline: showline = true,
+            showgrid: showgrid = true,
+            nticks: nticks = 20
+        }
+
+        var layout = {
+            title: title,
+            //SCATTER
+            xaxis: {
+                title: "Time",
+                domain: [0, 0.7], // 0 to 70% of width
+                zeroline: false,
+                showline: showline = true
+            },
+            yaxis: {
+                title: ylabel,
+                autorange: true,
+                //range: [0,50],
+                zeroline: false,
+                showline: showline = true
+            },
+            //HISTOGRAM
+            xaxis2: {
+                domain: [0.8, 1], // 70 to 100% of width
+                showline: showline = true,
+                title: "Frequency"
+                //overlaying: 'y'
+            },
+            yaxis2: {
+                anchor: 'x2',
+                showline:showline = false,
+                title: ylabel,
+                //showticklabels: true,
+                //overlaying: 'y'
+            },
+            xaxis3:{
+                domain:[0.8, 1],
+                overlaying: 'x2',
+                autorange: true,
+                side: 'top',
+                showline: showline = true,
+                showgrid: showgrid = false,
+                title: "Normal Distribution"
+            },
+            yaxis3:{
+                anchor:'x3',
+                showticklabels: true,
+                overlaying: 'y2',
+                autorange: true,
+                side: 'right'
+            }
+        }
+
+        var config = {responsive: true, displaylogo: false}
+        Plotly.newPlot(ROOT, data, layout, config)
+
+      </script>
+{% endblock %}

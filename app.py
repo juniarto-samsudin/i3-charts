@@ -6,6 +6,7 @@ from histogram.histoApp import histoApp
 from base.baseApp import baseApp
 from spc.spcApp import spcApp
 from restdatagenerator.restdatageneratorApp import restdatageneratorApp
+#from externalrestapi.externalrestapiApp import externalrestapiApp
 
 app = Flask(__name__)
 app.secret_key = "dev"
@@ -15,6 +16,7 @@ app.register_blueprint(histoApp, url_prefix="/histogram")
 app.register_blueprint(baseApp, url_prefix="/base")
 app.register_blueprint(spcApp, url_prefix="/spc")
 app.register_blueprint(restdatageneratorApp,url_prefix="/restdatagenerator")
+#app.register_blueprint(externalrestapiApp,url_prefix="/externalrestapi")
 
 app.config.from_object("config.ProductionConfig")
 print(app.config["DB_NAME"])
