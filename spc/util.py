@@ -89,8 +89,13 @@ def genNormalCurve(data):
         count = count + 1
     #Y-Axis
     yList = []
+    mean = calcMean(data)
+    stddev = calcStdDev(data)
     for x in xList:
-        temp = scipy.stats.norm(calcMean(data), calcStdDev(data)).pdf(x)
+        #temp = scipy.stats.norm(calcMean(data), calcStdDev(data)).pdf(x)
+        temp = scipy.stats.norm(mean,stddev).pdf(x)
+        if math.isnan(temp): #artificial data set can result in NAN
+            temp=0
         yList.append(temp)
     return xList, yList
 
@@ -103,3 +108,7 @@ def convertDateTime(readTime, readDate):
     dateResult = myYear+"-"+myMonth+"-"+myDay
     timeDateResult = dateResult + " " + myTime
     return timeDateResult
+
+def addSingleQuote(str):
+    mystring = "'" + str + "'"
+    return mystring

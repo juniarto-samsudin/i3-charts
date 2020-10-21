@@ -7,7 +7,7 @@ class Config(object):
     DB_PASSWORD = "password"
     ENVDATA_API_URL_HISTORICAL = "https://i3.zapto.org/bdm01/getEnvDataByTime.php"
     ENVDATA_API_URL_LIVE = "https://i3.zapto.org/bdm01/getEnvDataByDuration.php"
-    FANUC_API_URL_HISTORICAL ="https://i3.zapto.org/bdm01/getEnvDataByTime.php"
+    FANUC_API_URL_HISTORICAL ="https://i3.zapto.org/bdm01/getFanucDataByTime.php"
     FANUC_API_URL_LIVE = "https://i3.zapto.org/bdm01/getFanucDataByDuration.php"
 
 class ProductionConfig(Config):

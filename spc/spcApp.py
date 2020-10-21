@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from spc.util import readCsvFile, readTorquePower, getStatisticFromList
+from spc.util import readCsvFile, readTorquePower, getStatisticFromList, addSingleQuote
 from restdatagenerator import restdatageneratorApp
 from externalrestapi import externalrestapiApp
 
@@ -16,7 +16,7 @@ def spcHistorical(machinename):
     lcl = request.args.get('lcl')
     ucl = request.args.get('ucl')
     sp = request.args.get('sp')
-    #get-data
+
     if machinename == "envdata":
         envparameter = request.args.get('envparameter') #humidity or temperature
         tempList, humList, dateList = externalrestapiApp.env_historical(starttime, endtime)
@@ -49,17 +49,35 @@ def spcHistorical(machinename):
                                    xNormalDistList=xNormDistList,
                                    yNormalDistList=yNormDistList,
                                    envparameter=envparameter)
-            # return render_template('spcHistorical.html', dateTime=dateTime, readTorque=readTorque, readPower=readPower,
-            #                        torqueStdDev=torqueStdDev, powerStdDev=powerStdDev, torqueMean=torqueMean,
-            #                        powerMean=powerMean, title=title, titlex=titlex, titley=titley, xList=xList,
-            #                        yList=yList,
-            #                        starttime=starttime, endtime=endtime)
     elif machinename == "fanuc":
-        resp = externalrestapiApp.fanuc_historical(starttime, endtime)
-        return resp
+        machineID = request.args.get('machineID')
+        paraIndex = request.args.get('paraIndex')
+        envparameter = request.args.get('envparameter')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("paraIndex:", paraIndex)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime), str(endtime))
+        StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+        return render_template('spcHistorical.html',
+                               dateTime=dateList,
+                               plotParameter=paramList,
+                               StdDev=StdDev,
+                               lcl=int(lcl),
+                               ucl=int(ucl),
+                               sp=int(sp),
+                               title=title,
+                               ylabel=ylabel,
+                               xNormalDistList=xNormDistList,
+                               yNormalDistList=yNormDistList,
+                               envparameter=envparameter
+                               )
 
 @spcApp.route("/live/<machinename>")
 def spcLive(machinename):
+    print("SPC-LIVE")
     #parameters
     duration = request.args.get('duration')
     xlabel = request.args.get('xlabel')
@@ -68,14 +86,58 @@ def spcLive(machinename):
     lcl = request.args.get('lcl')
     ucl = request.args.get('ucl')
     sp = request.args.get('sp')
+    freq = request.args.get('freq')
     #get-data
     if machinename == "envdata":
-        resp = externalrestapiApp.env_live(int(duration))
-        return resp
+        print("LIVE-ENVDATA")
+        envparameter = request.args.get('envparameter')  # humidity or temperature
+        tempList, humList, dateList = externalrestapiApp.env_live(int(duration))
+        if envparameter == "temperature":
+            return render_template('spcLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=tempList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   duration=duration)
+        elif envparameter == "humidity":
+            return render_template('spcLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=humList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   duration=duration)
     elif machinename == "fanuc":
-
-        resp = externalrestapiApp.fanuc_live(int(duration))
-        return resp
+        machineID = request.args.get('machineID')
+        paraIndex = request.args.get('paraIndex')
+        envparameter = request.args.get('envparameter')
+        paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
+        return render_template('spcLive.html',
+                               dateTime=dateList,
+                               plotParameter=paramList,
+                               title=title,
+                               ylabel=ylabel,
+                               freq=freq,
+                               lcl=lcl,
+                               ucl=ucl,
+                               sp=sp,
+                               envparameter=envparameter,
+                               machinename=machinename,
+                               machineID=machineID,
+                               paraIndex=paraIndex,
+                               duration=duration
+                               )
 
 
 @spcApp.route("/<machinename>")

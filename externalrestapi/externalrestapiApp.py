@@ -1,33 +1,77 @@
-#from flask import Blueprint
-from flask import current_app
+from flask import Blueprint
+from flask import current_app, Response
 import requests
 import simplejson as json
 
-#externalrestapiApp =  Blueprint('externalrestapiApplication', __name__)
+externalrestapiApp =  Blueprint('externalrestapiApplication', __name__)
 
 
-#@externalrestapiApp.route("/live")
+@externalrestapiApp.route("/envlive/<duration>")
 def env_live(duration):
-    print("duration: ", duration)
+    print("inside envlive duration: ", duration)
     API_URL = current_app.config['ENVDATA_API_URL_LIVE']
     r = requests.post(API_URL, data={'duration': duration}, verify=False)
-    return r.content
-#@externalrestapiApp.route("/historical")
+    return processEnvData(r.content)
+
+@externalrestapiApp.route("/envlivejson/<duration>")
+def env_live_json(duration):
+    print("inside envlive json duration: ", duration)
+    API_URL = current_app.config['ENVDATA_API_URL_LIVE']
+    r = requests.post(API_URL, data={'duration': duration}, verify=False)
+    return response(processEnvData(r.content))
+
+@externalrestapiApp.route("/envhistorical")
 def env_historical(starttime,endtime):
-    print("starttime: ", starttime)
-    print("endtime: ", endtime)
     API_URL = current_app.config['ENVDATA_API_URL_HISTORICAL']
     r = requests.post(API_URL, data={'starttime': starttime,
                                      'endtime': endtime
                                      },verify=False)
     #tempList, humList, timeList = processEnvData(r.content)
     return processEnvData(r.content)
-def fanuc_live(duration):
+
+@externalrestapiApp.route("/fanuclive")
+def fanuc_live(machineID, paraIndex, duration):
     API_URL = current_app.config['FANUC_API_URL_LIVE']
-    return API_URL
-def fanuc_historical(starttime, endtime):
+    print("API-URL: ", API_URL)
+    print(machineID)
+    print(paraIndex)
+    print(duration)
+    r = requests.post(API_URL, data={
+        'machineID':machineID,
+        'paraIndex':paraIndex,
+        'duration': duration
+    }, verify=False)
+    return processFanucData(r.content)
+
+@externalrestapiApp.route("/fanuclivejson/<machineID>/<paraIndex>/<duration>")
+def fanuc_live_json(machineID, paraIndex, duration):
+    API_URL = current_app.config['FANUC_API_URL_LIVE']
+    print("API-URL: ", API_URL)
+    print(machineID)
+    print(paraIndex)
+    print(duration)
+    r = requests.post(API_URL, data={
+        'machineID':machineID,
+        'paraIndex':paraIndex,
+        'duration': duration
+    }, verify=False)
+    return response(processFanucData(r.content))
+
+@externalrestapiApp.route("/fanuchistorical")
+def fanuc_historical(machineID, paraIndex, starttime, endtime):
     API_URL = current_app.config['FANUC_API_URL_HISTORICAL']
-    return API_URL
+    print("API-URL: ", API_URL)
+    print(machineID)
+    print(paraIndex)
+    print(starttime)
+    print(endtime)
+    r = requests.post(API_URL, data={
+        'machineID':machineID,
+        'paraIndex':paraIndex,
+        'starttime':starttime,
+        'endtime':endtime
+    },verify=False)
+    return processFanucData(r.content)
 
 
 def processEnvData(jsonString):
@@ -47,3 +91,25 @@ def processEnvData(jsonString):
         timeList.append(item[2]['date'])
     return tempList,humList,timeList
 
+def processFanucData(jsonString):
+    '''
+    [[219.89999389648438,{"date":"2020-10-20 03:54:42.000000","timezone_type":3,"timezone":"UTC"}],
+    [219.89999389648438,{"date":"2020-10-20 03:54:43.000000","timezone_type":3,"timezone":"UTC"}],
+    [219.89999389648438,{"date":"2020-10-20 03:54:44.000000","timezone_type":3,"timezone":"UTC"}],
+    [219.89999389648438,{"date":"2020-10-20 03:54:46.000000","timezone_type":3,"timezone":"UTC"}],
+    [219.89999389648438,{"date":"2020-10-20 03:54:47.000000","timezone_type":3,"timezone":"UTC"}]]
+    '''
+    print('processfanucdata: ', jsonString)
+    jsonObj = json.loads(jsonString)
+    paramList = []
+    timeList = []
+    for item in jsonObj:
+        paramList.append(item[0])
+        timeList.append(item[1]['date'])
+    return paramList, timeList
+
+# build a Json response
+def response( data ):
+    return Response( response=json.dumps(data),
+                               status=200,
+                               mimetype='application/json' )
