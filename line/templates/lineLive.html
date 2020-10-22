@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Line Chart{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        ROOT = document.getElementById("myDiv")
+        machinename = "{{ machinename|safe }}"
+        freq = {{ freq|tojson|safe }}
+        x = {{ dateTime | safe }}
+        plotParameter = {{ plotParameter|safe }}
+        envparameter = {{ envparameter|safe|tojson }}
+        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+        sp= {{ sp|safe }}
+        lcl = {{  lcl|safe|tojson }}
+        ucl = {{  ucl|safe|tojson }}
+        title = {{  title|safe|tojson }}
+        ylabel = {{ ylabel|safe|tojson }}
+
+        machineID= {{ machineID|safe|tojson  }}
+        paraIndex= {{ paraIndex|safe|tojson }}
+        duration={{ duration|safe }}
+
+        drawChart(x,plotParameter,ucl, lcl, setPointValue)
+
+        function drawChart(x,plotParameter, ucl, lcl, setPointValue){
+            console.log("DRAWING CHART")
+            var parameter = {
+                x: x,
+                y: plotParameter,
+                name: envparameter,
+                type: 'scatter'
+            }
+
+            var setPoint =
+            {
+                x: x,
+                y: setPointValue,
+                name: 'set point',
+                type: 'scatter'
+            }
+
+            var CL =
+            {
+                type: 'scatter',
+                //x: ['2020-07-24 14:10:05','2020-07-24 14:30:05',null, '2020-07-24 14:10:05','2020-07-24 14:30:05'],
+                x:[x[0], x[x.length -1], null, x[0],x[x.length -1]],
+                y: [lcl, lcl,null, ucl, ucl],
+                mode: 'lines',
+                name: 'LCL/UCL',
+                showlegend: true,
+                line: {
+                    color: 'red',
+                    width: 2,
+                    dash: 'dash'
+                }
+            }
+
+            var data = [parameter, setPoint, CL]
+
+            var layout = {
+                title: title,
+                yaxis: {
+                    title: ylabel,
+                    autorange: true,
+                    type: 'linear',
+                    showline: showline = true,
+                    showgrid: showgrid = true,
+                    nticks: nticks = 6
+                },
+                xaxis:{
+                    title: "Time",
+                    showline: showline = true
+                }
+            }
+
+            var config = {responsive: true, displaylogo:false}
+            Plotly.newPlot(ROOT, data, layout, config)
+        }
+
+
+        function reRender(){
+            myurl = "{{ url_for('externalrestapiApplication.fanuc_live_json',machineID=machineID, paraIndex=paraIndex, duration=duration) }}"
+            console.log("MYURL: ", myurl)
+            $.ajax({
+                type: "GET",
+                url: myurl,
+                dataType: 'json'
+            }).done(function(jsondata, status, xhr){
+                console.log("RESPONSE: ", jsondata);
+                var x
+                var plotParameter
+                if (machinename == "fanuc"){
+                    x = jsondata[1]
+                    plotParameter = jsondata[0]
+                }
+                setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+                drawChart(x,plotParameter,ucl, lcl, setPointValue)
+            }).fail(function(xhr, status, error){
+                console.log("AJAX FAILED")
+            })
+        }
+        setInterval(reRender, freq)
+
+      </script>
+{% endblock %}

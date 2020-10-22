@@ -57,3 +57,7 @@ def convertDateTime(readTime, readDate):
     dateResult = myYear+"-"+myMonth+"-"+myDay
     timeDateResult = dateResult + " " + myTime
     return timeDateResult
+
+def addSingleQuote(str):
+    mystring = "'" + str + "'"
+    return mystring

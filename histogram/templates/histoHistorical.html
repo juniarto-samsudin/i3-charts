@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Histogram Historical Chart{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        ROOT = document.getElementById("myDiv")
+        x = {{ dateTime | safe }}
+        plotParameter = {{ plotParameter|safe }}
+        envparameter = {{ envparameter|safe|tojson }}
+        StdDev = {{ StdDev|safe }}
+        Mean = {{ Mean|safe }}
+        xNormalDistribution = {{ xNormalDistList|safe }}
+        yNormalDistribution = {{ yNormalDistList|safe }}
+        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+        lcl = {{  lcl|safe }}
+        ucl = {{  ucl|safe }}
+        title = {{  title|safe|tojson }}
+        ylabel = {{ ylabel|safe|tojson }}
+
+        var readValue={
+            x: plotParameter,
+            autobinx: true,
+            //xbins:{size: StdDev},
+            name: envparameter,
+            type: 'histogram'
+        }
+
+
+        var normaldistribution = {
+            x: xNormalDistribution,
+            y: yNormalDistribution,
+            yaxis:'y2',
+            xaxis: 'x',
+            type:'scatter',
+            name: 'Normal Distribution'
+        }
+
+        var data = [readValue]
+
+var layout = {
+            title: title,
+            //barmode: "overlay",
+            bargroupgap: 0.05,
+            //bargap: 0.05,
+            yaxis:{
+                title: "frequency",
+                autorange: true,
+                //range: [-5.00, 5.00],
+                type: 'linear',
+                showline: showline = true,
+                showgrid: showgrid = false,
+                nticks: nticks =6,
+                //zeroline: false
+            },
+            yaxis2:{
+                side: 'right',
+                autorange: true,
+                overlaying: 'y',
+                showline: showline = true,
+                showgrid: showgrid = false,
+                //zeroline: false
+            },
+            xaxis:{
+                title: ylabel,
+                autorange: true,
+                zeroline: true,
+                //showgrid: showgrid = false,
+                showline: showline = false,
+            },
+            {#annotations: [
+                {
+                    x: 25,
+                    y: 25,
+                    //xref: 'x',
+                    yref: 'y',
+                    text: 'stddev: ' +  StdDev  +  ' mean: ' + Mean ,
+                    showarrow: false,
+                    //arrowhead: 7,
+                    //ax: 0,
+                    //ay: -40
+                }
+            ]#}
+    }
+
+var config = {responsive: true, displaylogo:false}
+Plotly.newPlot(ROOT, data, layout, config)
+
+      </script>
+{% endblock %}

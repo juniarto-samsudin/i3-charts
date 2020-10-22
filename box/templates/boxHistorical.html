@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Box Historical Chart{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        ROOT = document.getElementById("myDiv")
+        x = {{ dateTime | safe }}
+        plotParameter = {{ plotParameter|safe }}
+        title = {{ title|safe|tojson }}
+        envparameter = {{ envparameter|safe|tojson }}
+        ylabel = {{ ylabel|safe|tojson }}
+        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+        lcl = {{  lcl|safe }}
+        ucl = {{  ucl|safe }}
+
+        var readValue = {
+            y:plotParameter,
+            type:'box',
+            name: envparameter
+        }
+
+        var data = [readValue]
+
+        var layout = {
+            title:envparameter,
+            yaxis:{
+                title: ylabel,
+                showline: showline = true
+            },
+            xaxis:{
+                showline: showline = true
+            }
+        }
+        var config = {responsive: true, displaylogo: false}
+        Plotly.newPlot(ROOT, data, layout, config)
+    </script>
+{% endblock %}

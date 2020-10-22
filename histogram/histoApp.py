@@ -1,8 +1,81 @@
 from flask import Blueprint, render_template, request
-from histogram.util import readCsvFile, readTorquePower
+from histogram.util import readCsvFile, readTorquePower, addSingleQuote
+from spc.util import getStatisticFromList
 from restdatagenerator import restdatageneratorApp
+from externalrestapi import externalrestapiApp
 
 histoApp = Blueprint("histoApplication", __name__, static_folder="static", template_folder="templates")
+
+@histoApp.route("/historical/<machinename>")
+def histoHistorical(machinename):
+    # parameters
+    starttime = request.args.get('starttime')
+    endtime = request.args.get('endtime')
+    xlabel = request.args.get('xlabel')
+    ylabel = request.args.get('ylabel')
+    title = request.args.get('title')
+    lcl = request.args.get('lcl')
+    ucl = request.args.get('ucl')
+    sp = request.args.get('sp')
+    if machinename == "fanuc":
+        machineID = request.args.get('machineID')
+        paraIndex = request.args.get('paraIndex')
+        envparameter = request.args.get('envparameter')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("paraIndex:", paraIndex)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime),
+                                                                  str(endtime))
+        StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+        return render_template('histoHistorical.html',
+                               dateTime=dateList,
+                               plotParameter=paramList,
+                               lcl=int(lcl),
+                               ucl=int(ucl),
+                               sp=int(sp),
+                               title=title,
+                               ylabel=ylabel,
+                               envparameter=envparameter,
+                               StdDev=StdDev,
+                               Mean=Mean,
+                               xNormalDistList=xNormDistList,
+                               yNormalDistList=yNormDistList
+                               )
+
+@histoApp.route("/live/<machinename>")
+def histoLive(machinename):
+    # parameters
+    duration = request.args.get('duration')
+    xlabel = request.args.get('xlabel')
+    ylabel = request.args.get('ylabel')
+    title = request.args.get('title')
+    lcl = request.args.get('lcl')
+    ucl = request.args.get('ucl')
+    sp = request.args.get('sp')
+    freq = request.args.get('freq')
+    machineID = request.args.get('machineID')
+    paraIndex = request.args.get('paraIndex')
+    envparameter = request.args.get('envparameter')
+    paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
+    return render_template('histoLive.html',
+                           dateTime=dateList,
+                           plotParameter=paramList,
+                           title=title,
+                           ylabel=ylabel,
+                           freq=freq,
+                           lcl=lcl,
+                           ucl=ucl,
+                           sp=sp,
+                           envparameter=envparameter,
+                           machinename=machinename,
+                           machineID=machineID,
+                           paraIndex=paraIndex,
+                           duration=duration
+                           )
+
 
 @histoApp.route("/<machinename>")
 def default(machinename):

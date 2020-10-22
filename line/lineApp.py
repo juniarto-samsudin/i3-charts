@@ -1,10 +1,79 @@
 from flask import Blueprint, render_template, request, url_for
-from line.util import readCsvFile, readTorquePower
+from line.util import readCsvFile, readTorquePower, addSingleQuote
 import requests
 from restdatagenerator import restdatageneratorApp
+from externalrestapi import externalrestapiApp
 import simplejson as json
 
 lineApp = Blueprint("lineApplication", __name__, static_folder="static", template_folder="templates")
+
+@lineApp.route("/historical/<machinename>")
+def lineHistorical(machinename):
+    #parameters
+    starttime = request.args.get('starttime')
+    endtime = request.args.get('endtime')
+    xlabel = request.args.get('xlabel')
+    ylabel = request.args.get('ylabel')
+    title = request.args.get('title')
+    lcl = request.args.get('lcl')
+    ucl = request.args.get('ucl')
+    sp = request.args.get('sp')
+    if machinename == "fanuc":
+        machineID = request.args.get('machineID')
+        paraIndex = request.args.get('paraIndex')
+        envparameter = request.args.get('envparameter')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("paraIndex:", paraIndex)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime),
+                                                                  str(endtime))
+        return render_template('lineHistorical.html',
+                               dateTime=dateList,
+                               plotParameter=paramList,
+                               lcl=int(lcl),
+                               ucl=int(ucl),
+                               sp=int(sp),
+                               title=title,
+                               ylabel=ylabel,
+                               envparameter=envparameter
+                               )
+
+@lineApp.route("/live/<machinename>")
+def lineLive(machinename):
+    # parameters
+    duration = request.args.get('duration')
+    xlabel = request.args.get('xlabel')
+    ylabel = request.args.get('ylabel')
+    title = request.args.get('title')
+    lcl = request.args.get('lcl')
+    ucl = request.args.get('ucl')
+    sp = request.args.get('sp')
+    freq = request.args.get('freq')
+    if machinename == "fanuc":
+        machineID = request.args.get('machineID')
+        paraIndex = request.args.get('paraIndex')
+        envparameter = request.args.get('envparameter')
+        paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
+        return render_template('lineLive.html',
+                               dateTime=dateList,
+                               plotParameter=paramList,
+                               title=title,
+                               ylabel=ylabel,
+                               freq=freq,
+                               lcl=lcl,
+                               ucl=ucl,
+                               sp=sp,
+                               envparameter=envparameter,
+                               machinename=machinename,
+                               machineID=machineID,
+                               paraIndex=paraIndex,
+                               duration=duration
+                               )
+
+
 
 @lineApp.route("/<machinename>")
 def default(machinename):

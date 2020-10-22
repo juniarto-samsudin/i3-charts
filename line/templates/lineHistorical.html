@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Line Historical Chart{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        ROOT = document.getElementById("myDiv")
+        x = {{ dateTime | safe }}
+        plotParameter = {{ plotParameter|safe }}
+        title = {{ title|safe|tojson }}
+        envparameter = {{ envparameter|safe|tojson }}
+        ylabel = {{ ylabel|safe|tojson }}
+        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+        lcl = {{  lcl|safe }}
+        ucl = {{  ucl|safe }}
+
+        var setPoint =
+            {
+                x: x,
+                y: setPointValue,
+                name: 'set point',
+                type: 'scatter'
+            }
+        var CL =
+            {
+                type: 'scatter',
+                //x: ['2020-07-24 14:10:05','2020-07-24 14:30:05',null, '2020-07-24 14:10:05','2020-07-24 14:30:05'],
+                x:[x[0], x[x.length -1], null, x[0],x[x.length -1]],
+                y: [lcl, lcl,null, ucl, ucl],
+                mode: 'lines',
+                name: 'LCL/UCL',
+                showlegend: true,
+                line: {
+                    color: 'red',
+                    width: 2,
+                    dash: 'dash'
+                }
+            }
+
+
+
+        var readValue={
+            x: x,
+            y: plotParameter,
+            name: envparameter,
+            type: 'scatter'
+        }
+
+        var data = [readValue, setPoint, CL]
+
+
+var layout = {
+            title: title,
+            yaxis:{
+                title: ylabel,
+                autorange: true,
+                type: 'linear',
+                showline: showline = true,
+                showgrid: showgrid = true,
+                nticks: nticks =6
+            },
+            xaxis:{
+                title: "Time",
+                showline: showline = true
+            }
+}
+
+var config = {responsive: true, displaylogo:false}
+Plotly.newPlot(ROOT, data, layout, config)
+
+      </script>
+{% endblock %}

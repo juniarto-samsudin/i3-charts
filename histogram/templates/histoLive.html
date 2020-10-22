@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Histogram Live Chart{% endblock %}
+{% block content %}
+    <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
+    <div id="myDiv"></div>
+    <script>
+        ROOT = document.getElementById("myDiv")
+        machinename = {{ machinename|safe|tojson }}
+        freq = {{ freq|tojson|safe }}
+        x = {{ dateTime | safe }}
+        plotParameter = {{ plotParameter|safe }}
+        envparameter = {{ envparameter|safe|tojson }}
+        sp= {{ sp|safe }}
+        lcl = {{  lcl|safe|tojson }}
+        ucl = {{  ucl|safe|tojson }}
+        title = {{  title|safe|tojson }}
+        ylabel = {{ ylabel|safe|tojson }}
+
+        machineID= {{ machineID|safe|tojson  }}
+        paraIndex= {{ paraIndex|safe|tojson }}
+        duration={{ duration|safe|tojson }}
+
+        drawChart(plotParameter)
+
+        function drawChart(plotParameter){
+            var parameter = {
+                //x: chartDateTime,
+                x: plotParameter,
+                autobinx: true,
+                //xbins: {size:stdDev},
+                name: envparameter,
+                type: 'histogram'
+            }
+
+            var data = [parameter]
+
+            var layout = {
+                title: title,
+                bargroupgap: 0.05,
+
+                xaxis:{
+                    title: "Frequency",
+                    autorange: true
+                },
+                yaxis:{
+                    title:ylabel,
+                    autorange: true
+                }
+            }
+
+            var config = {responsive: true, displaylogo:false}
+            Plotly.newPlot(ROOT, data, layout, config)
+        }
+
+
+
+        function reRender(){
+            myurl = "{{ url_for('externalrestapiApplication.fanuc_live_json',machineID=machineID, paraIndex=paraIndex, duration=duration) }}"
+            console.log("MYURL: ", myurl)
+            $.ajax({
+                type: "GET",
+                url: myurl,
+                dataType: 'json'
+            }).done(function(jsondata, status, xhr){
+                console.log("RESPONSE: ", jsondata);
+                var x
+                var plotParameter
+                x = jsondata[1]
+                plotParameter = jsondata[0]
+                drawChart(plotParameter)
+            }).fail(function(xhr, status, error){
+                console.log("AJAX FAILED")
+            })
+        }
+
+        setInterval(reRender, freq)
+
+    </script>
+{% endblock %}
