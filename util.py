@@ -19,7 +19,7 @@ def readCsvFile(csvfile):
                 readTime.append(row[0])
                 readDate.append(row[1])
                 dateTime.append(convertDateTime(row[0],row[1]))
-                print ("DATETIME:", dateTime)
+                #print ("DATETIME:", dateTime)
                 readValue.append(row[2])
                 upperLimit.append(row[3])
                 lowerLimit.append(row[4])

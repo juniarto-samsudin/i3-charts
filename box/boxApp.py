@@ -93,6 +93,6 @@ def default(machinename):
         return render_template('boxTorquePowerLastHour.html', response=mystring, title=title, freq=freq)
     if (machinename == "testcsv"):
         dateTime, readValue, upperLimit, lowerLimit, setPoint = readCsvFile('temperature.csv')
-        return render_template("boxpage.html", readValue=ryaeadValue)
+        return render_template("boxpage.html", readValue=readValue)
     else:
         return render_template('tableNotFound.html')
