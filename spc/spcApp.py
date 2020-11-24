@@ -53,6 +53,7 @@ def spcHistorical(machinename):
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
         envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
         starttime = addSingleQuote(starttime)
         endtime = addSingleQuote(endtime)
         print("MACHINEID:", machineID)
@@ -72,7 +73,8 @@ def spcHistorical(machinename):
                                ylabel=ylabel,
                                xNormalDistList=xNormDistList,
                                yNormalDistList=yNormDistList,
-                               envparameter=envparameter
+                               envparameter=envparameter,
+                               noCL = noCL
                                )
 
 @spcApp.route("/live/<machinename>")
@@ -122,6 +124,7 @@ def spcLive(machinename):
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
         envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
         paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
         return render_template('spcLive.html',
                                dateTime=dateList,
@@ -136,7 +139,8 @@ def spcLive(machinename):
                                machinename=machinename,
                                machineID=machineID,
                                paraIndex=paraIndex,
-                               duration=duration
+                               duration=duration,
+                               noCL = noCL
                                )
 
 

@@ -32,16 +32,21 @@ def env_historical(starttime,endtime):
 @externalrestapiApp.route("/fanuclive")
 def fanuc_live(machineID, paraIndex, duration):
     API_URL = current_app.config['FANUC_API_URL_LIVE']
-    print("API-URL: ", API_URL)
-    print(machineID)
+    print("FANUC LIVE API-URL: ", API_URL)
+    print('MachineID: ', machineID)
     print(paraIndex)
     print(duration)
-    r = requests.post(API_URL, data={
-        'machineID':machineID,
-        'paraIndex':paraIndex,
-        'duration': duration
-    }, verify=False)
-    return processFanucData(r.content)
+    try:
+        r = requests.post(API_URL, data={
+            'machineID':machineID,
+            'paraIndex':paraIndex,
+            'duration': duration
+            }, verify=False)
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as err:
+        return('Server taking too long. Try again later')
+    else:
+        print("AFTER REQUEST")
+        return processFanucData(r.content)
 
 @externalrestapiApp.route("/fanuclivejson/<machineID>/<paraIndex>/<duration>")
 def fanuc_live_json(machineID, paraIndex, duration):
@@ -99,7 +104,7 @@ def processFanucData(jsonString):
     [219.89999389648438,{"date":"2020-10-20 03:54:46.000000","timezone_type":3,"timezone":"UTC"}],
     [219.89999389648438,{"date":"2020-10-20 03:54:47.000000","timezone_type":3,"timezone":"UTC"}]]
     '''
-    print('processfanucdata: ', jsonString)
+    #print('processfanucdata: ', jsonString)
     jsonObj = json.loads(jsonString)
     paramList = []
     timeList = []

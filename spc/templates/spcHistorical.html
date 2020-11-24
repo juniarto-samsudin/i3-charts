@@ -16,6 +16,14 @@
         ucl = {{  ucl|safe }}
         title = "{{  title|safe }}"
         ylabel = "{{ ylabel|safe }}"
+
+        {% if noCL != None %}
+            noCL={{ noCL | safe }}
+        {% else  %}
+            noCL = 0 //SHOW CL AND SP
+        {% endif %}
+
+
         var setPoint =
             {
                 x: x,
@@ -92,8 +100,16 @@
             name: 'Normal Distribution'
         }
 
+        var data
+        if (noCL == 1){
+            console.log("NOCLSP")
+            data = [readValue, normaldistribution, histo]
+        }else{
+            console.log("YESCLSP")
+            data = [readValue, CL, setPoint,normaldistribution, histo]
+        }
 
-        var data = [readValue, CL, setPoint,normaldistribution,  histo]
+        //var data = [readValue, CL, setPoint,normaldistribution,  histo]
 
 
         axis_template={

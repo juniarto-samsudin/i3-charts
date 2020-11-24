@@ -21,6 +21,13 @@
         paraIndex= "{{ paraIndex|safe }}"
         duration={{ duration|safe }}
 
+        {% if noCL != None %}
+            noCL={{ noCL | safe }}
+        {% else  %}
+            noCL = 0 //SHOW CL AND SP
+        {% endif %}
+
+
 
         console.log("MACHINENAME: ", machinename)
         console.log("UPPERLIMIT: ", ucl)
@@ -95,7 +102,14 @@
 
 
             //var data = [parameter, upperLimitLine, lowerLimitLine, histo]
-            var data = [parameter, setPoint, CL, histo]
+            var data
+            if (noCL == 1) {
+                console.log("NOCLSP")
+                data = [parameter, histo]
+            }else{ //NO CL and SP
+                console.log("YESCLSP")
+                data = [parameter, setPoint, CL, histo]
+            }
             var layout = {
                 title: title,
                 xaxis: {
