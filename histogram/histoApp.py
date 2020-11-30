@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request
 from histogram.util import readCsvFile, readTorquePower, addSingleQuote
 from spc.util import getStatisticFromList
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp
+from externalrestapi import externalrestapiApp, moldmasterapi
 
 histoApp = Blueprint("histoApplication", __name__, static_folder="static", template_folder="templates")
 
@@ -27,10 +27,11 @@ def histoHistorical(machinename):
         print("paraIndex:", paraIndex)
         print("starttime:", starttime)
         print("endtime:", endtime)
-        paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime),
+        statusCode,paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime),
                                                                   str(endtime))
-        StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
-        return render_template('histoHistorical.html',
+        if (statusCode == 200):
+            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+            return render_template('histoHistorical.html',
                                dateTime=dateList,
                                plotParameter=paramList,
                                lcl=int(lcl),
@@ -44,6 +45,37 @@ def histoHistorical(machinename):
                                xNormalDistList=xNormDistList,
                                yNormalDistList=yNormDistList
                                )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    if machinename == "moldmaster":
+        print ("INSIDE HISTO MOLDMASTER HISTORICAL")
+        machineID = request.args.get('machineID')
+        tipID = request.args.get('tipID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = moldmasterapi.moldmaster_historical(machineID, tipID, fieldID, starttime,
+                                                                              endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('boxHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 @histoApp.route("/live/<machinename>")
 def histoLive(machinename):
@@ -56,11 +88,13 @@ def histoLive(machinename):
     ucl = request.args.get('ucl')
     sp = request.args.get('sp')
     freq = request.args.get('freq')
-    machineID = request.args.get('machineID')
-    paraIndex = request.args.get('paraIndex')
-    envparameter = request.args.get('envparameter')
-    paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
-    return render_template('histoLive.html',
+    if machinename == "fanuc":
+        machineID = request.args.get('machineID')
+        paraIndex = request.args.get('paraIndex')
+        envparameter = request.args.get('envparameter')
+        statusCode, paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
+        if (statusCode == 200):
+            return render_template('histoLive.html',
                            dateTime=dateList,
                            plotParameter=paramList,
                            title=title,
@@ -75,7 +109,42 @@ def histoLive(machinename):
                            paraIndex=paraIndex,
                            duration=duration
                            )
-
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "moldmaster":
+        print("INSIDE MOLDMASTERLIVE")
+        machineID = request.args.get('machineID')
+        tipID = request.args.get('tipID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = moldmasterapi.moldmaster_live(machineID, tipID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('histoLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   tipID=tipID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 @histoApp.route("/<machinename>")
 def default(machinename):
@@ -113,6 +182,7 @@ def default(machinename):
         return render_template('histoTorquePower.html', dateTime=dateTime, readTorque=readTorque, readPower=readPower, torqueStdDev=torqueStdDev, powerStdDev=powerStdDev, torqueMean=torqueMean, powerMean=powerMean, title=title, titlex=titlex, titley=titley,xList=xList, yList=yList, starttime=starttime, endtime=endtime)
     else:
         return render_template('tableNotFound.html')
+
 @histoApp.route("/duration/<machinename>")
 def duration(machinename):
     lasthours = request.args.get('lasthours')

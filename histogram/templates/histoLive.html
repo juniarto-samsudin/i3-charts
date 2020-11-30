@@ -6,7 +6,9 @@
     <script>
         ROOT = document.getElementById("myDiv")
         machinename = {{ machinename|safe|tojson }}
-        freq = {{ freq|tojson|safe }}
+        machineID= {{ machineID|safe|tojson  }}
+        duration={{ duration|safe }}
+
         x = {{ dateTime | safe }}
         plotParameter = {{ plotParameter|safe }}
         envparameter = {{ envparameter|safe|tojson }}
@@ -16,9 +18,21 @@
         title = {{  title|safe|tojson }}
         ylabel = {{ ylabel|safe|tojson }}
 
-        machineID= {{ machineID|safe|tojson  }}
-        paraIndex= {{ paraIndex|safe|tojson }}
-        duration={{ duration|safe|tojson }}
+        {% if machinename == 'fanuc' %}
+            paraIndex= {{ paraIndex|safe|tojson }}
+            console.log("HELLO FANUC")
+        {% elif machinename == 'moldmaster' %}
+            tipID = "{{ tipID|safe }}"
+            fieldID = "{{ fieldID|safe }}"
+            console.log("HELLO MOLDMASTER")
+        {% endif %}
+
+        {% if freq != None %}
+            freq = {{ freq | safe | tojson }}
+                {% else %}
+            freq = 60000
+        {% endif %}
+
 
         drawChart(plotParameter)
 
@@ -55,8 +69,20 @@
 
 
         function reRender(){
-            myurl = "{{ url_for('externalrestapiApplication.fanuc_live_json',machineID=machineID, paraIndex=paraIndex, duration=duration) }}"
-            console.log("MYURL: ", myurl)
+            var myurl
+            switch(machinename){
+                case "envdata":
+                    myurl = "{{ url_for('externalrestapiApplication.env_live_json',duration=duration) }}"
+                    break
+                case "fanuc":
+                    myurl = "{{ url_for('externalrestapiApplication.fanuc_live_json',machineID=machineID, paraIndex=paraIndex, duration=duration) }}"
+                    break
+                case "moldmaster":
+                    myurl = "{{ url_for('moldmasterapiApplication.moldmaster_live_json',machineID=machineID, tipID=tipID, fieldID=fieldID, duration=duration) }}"
+                    break
+                default:
+            }
+
             $.ajax({
                 type: "GET",
                 url: myurl,
@@ -65,8 +91,15 @@
                 console.log("RESPONSE: ", jsondata);
                 var x
                 var plotParameter
-                x = jsondata[1]
-                plotParameter = jsondata[0]
+                if (machinename == "fanuc"){
+                    x = jsondata[1]
+                    plotParameter = jsondata[0]
+                } else if (machinename == "moldmaster"){
+                    plotParameter = jsondata[0]
+                    x = jsondata[1]
+                    console.log("MOLDMASTER")
+                    console.log("STATUS: ", xhr.status)
+                }
                 drawChart(plotParameter)
             }).fail(function(xhr, status, error){
                 console.log("AJAX FAILED")

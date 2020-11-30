@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from spc.util import readCsvFile, readTorquePower, getStatisticFromList, addSingleQuote
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp
+from externalrestapi import externalrestapiApp, moldmasterapi
 
 spcApp = Blueprint("spcApplication", __name__, static_folder="static", template_folder="templates")
 
@@ -60,9 +60,11 @@ def spcHistorical(machinename):
         print("paraIndex:", paraIndex)
         print("starttime:", starttime)
         print("endtime:", endtime)
-        paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime), str(endtime))
-        StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
-        return render_template('spcHistorical.html',
+        statusCode, paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime), str(endtime))
+        #StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+        if (statusCode == 200):
+            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+            return render_template('spcHistorical.html',
                                dateTime=dateList,
                                plotParameter=paramList,
                                StdDev=StdDev,
@@ -76,6 +78,45 @@ def spcHistorical(machinename):
                                envparameter=envparameter,
                                noCL = noCL
                                )
+        elif(statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "moldmaster":
+        print("INSIDE MOLDMASTERHISTORICAL")
+        machineID = request.args.get('machineID')
+        tipID = request.args.get('tipID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = moldmasterapi.moldmaster_historical(machineID, tipID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+            print('after statistics')
+            return render_template('spcHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   StdDev=StdDev,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   xNormalDistList=xNormDistList,
+                                   yNormalDistList=yNormDistList,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 @spcApp.route("/live/<machinename>")
 def spcLive(machinename):
@@ -93,9 +134,10 @@ def spcLive(machinename):
     if machinename == "envdata":
         print("LIVE-ENVDATA")
         envparameter = request.args.get('envparameter')  # humidity or temperature
-        tempList, humList, dateList = externalrestapiApp.env_live(int(duration))
+        statusCode, tempList, humList, dateList = externalrestapiApp.env_live(int(duration))
         if envparameter == "temperature":
-            return render_template('spcLive.html',
+            if (statusCode == 200):
+                return render_template('spcLive.html',
                                    dateTime=dateList,
                                    plotParameter=tempList,
                                    title=title,
@@ -107,8 +149,13 @@ def spcLive(machinename):
                                    envparameter=envparameter,
                                    machinename=machinename,
                                    duration=duration)
+            elif(statusCode == 999):
+                return render_template('ConnectionError.html')
+            else:
+                return render_template('tableNotFound.html')
         elif envparameter == "humidity":
-            return render_template('spcLive.html',
+            if (statusCode == 200):
+                return render_template('spcLive.html',
                                    dateTime=dateList,
                                    plotParameter=humList,
                                    title=title,
@@ -120,13 +167,18 @@ def spcLive(machinename):
                                    envparameter=envparameter,
                                    machinename=machinename,
                                    duration=duration)
+            elif(statusCode == 999):
+                return render_template('ConnectionError.html')
+            else:
+                return render_template('tableNotFound.html')
     elif machinename == "fanuc":
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
         envparameter = request.args.get('envparameter')
         noCL = request.args.get('noCL')
-        paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
-        return render_template('spcLive.html',
+        statusCode, paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
+        if (statusCode == 200):
+            return render_template('spcLive.html',
                                dateTime=dateList,
                                plotParameter=paramList,
                                title=title,
@@ -142,6 +194,42 @@ def spcLive(machinename):
                                duration=duration,
                                noCL = noCL
                                )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "moldmaster":
+        print("INSIDE MOLDMASTERLIVE")
+        machineID = request.args.get('machineID')
+        tipID = request.args.get('tipID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = moldmasterapi.moldmaster_live(machineID, tipID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('spcLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   tipID = tipID,
+                                   fieldID = fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 
 @spcApp.route("/<machinename>")

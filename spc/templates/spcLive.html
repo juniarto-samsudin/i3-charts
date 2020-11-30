@@ -1,25 +1,36 @@
 {% extends "base.html" %}
-{% block title %}Line Chart{% endblock %}
+{% block title %}SPC Chart and Distribution{% endblock %}
 {% block content %}
     <!--<div id="myDiv" style="width:1200px;height:250px;"></div>-->
     <div id="myDiv"></div>
     <script>
         ROOT = document.getElementById("myDiv")
         machinename = "{{ machinename|safe }}"
-        freq = {{ freq|tojson|safe }}
+        machineID= "{{ machineID|safe  }}"
+        duration={{ duration|safe }}
         x = {{ dateTime | safe }}
         plotParameter = {{ plotParameter|safe }}
         envparameter = "{{ envparameter|safe }}"
-        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
-        sp= {{ sp|safe }}
-        lcl = {{  lcl|safe|tojson }}
-        ucl = {{  ucl|safe|tojson }}
         title = "{{  title|safe }}"
         ylabel = "{{ ylabel|safe }}"
 
-        machineID= "{{ machineID|safe  }}"
-        paraIndex= "{{ paraIndex|safe }}"
-        duration={{ duration|safe }}
+
+        {% if machinename == 'fanuc' %}
+            paraIndex= "{{ paraIndex|safe }}"
+            console.log("HELLO FANUC")
+        {% elif machinename == 'moldmaster' %}
+            tipID = "{{ tipID|safe }}"
+            fieldID = "{{ fieldID|safe }}"
+            console.log("HELLO MOLDMASTER")
+        {% endif %}
+
+        {% if sp != none %}
+            setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+            sp= {{ sp|safe }}
+        {% else %}
+            sp = 0
+            setPointValue = x.map(xItem =>{return sp})
+        {% endif %}
 
         {% if noCL != None %}
             noCL={{ noCL | safe }}
@@ -27,14 +38,31 @@
             noCL = 0 //SHOW CL AND SP
         {% endif %}
 
+        {%  if lcl != None %}
+            lcl = {{ lcl | safe | tojson }}
+                {% else %}
+            lcl = 0
+        {% endif %}
 
+        {%  if ucl != None %}
+            ucl = {{ ucl | safe | tojson }}
+                {% else %}
+            ucl = 0
+        {% endif %}
+
+        {% if freq != None %}
+            freq = {{ freq | safe | tojson }}
+                {% else %}
+            freq = 60000
+        {% endif %}
 
         console.log("MACHINENAME: ", machinename)
         console.log("UPPERLIMIT: ", ucl)
         console.log("LOWERLIMIT: ", lcl)
         console.log("SETPOINT: ", sp)
         console.log("DURATION: ", duration)
-        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+        console.log("FREQ: ", freq)
+        {#  setPointValue = x.map(xItem =>{return {{ sp|safe }}}) #}
 
         {#
         console.log("MACHINENAME: ", resp.machineName)
@@ -166,6 +194,9 @@
                 case "fanuc":
                     myurl = "{{ url_for('externalrestapiApplication.fanuc_live_json',machineID=machineID, paraIndex=paraIndex, duration=duration) }}"
                     break
+                case "moldmaster":
+                    myurl = "{{ url_for('moldmasterapiApplication.moldmaster_live_json',machineID=machineID, tipID=tipID, fieldID=fieldID, duration=duration) }}"
+                    break
                 default:
             }
             console.log("MYURL: ", myurl)
@@ -190,9 +221,16 @@
                     x = jsondata[1]
                     plotParameter = jsondata[0]
                 }
-                console.log("TYPE OF X", typeof x)
-                console.log("LENGTH OF X", x.length)
-                setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+                else if (machinename == "moldmaster"){
+                    plotParameter = jsondata[0] //plotparameter
+                    x = jsondata[1] //time
+                    console.log("MOLDMASTER")
+                    //console.log(plotParameter)
+                    console.log("STATUS: ", xhr.status)
+                }
+                //console.log("TYPE OF X", typeof x)
+                //console.log("LENGTH OF X", x.length)
+                //setPointValue = x.map(xItem =>{return {{ sp|safe }}})
                 drawChart(x,plotParameter,ucl, lcl, setPointValue)
                 //console.log("TEMPERATURE: ", jsondata[0])
                 //console.log("HUMIDITY: ", jsondata[1])

@@ -10,8 +10,23 @@ externalrestapiApp =  Blueprint('externalrestapiApplication', __name__)
 def env_live(duration):
     print("inside envlive duration: ", duration)
     API_URL = current_app.config['ENVDATA_API_URL_LIVE']
-    r = requests.post(API_URL, data={'duration': duration}, verify=False)
-    return processEnvData(r.content)
+    try:
+        r = requests.post(API_URL, data={'duration': duration}, verify=False)
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.RequestException) as err:
+        tempList=[]
+        humList=[]
+        timeList=[]
+        status_code=999
+        return status_code, tempList,humList,timeList
+    else:
+        if (r.status_code == 200):
+            tempList, humList, timeList = processEnvData(r.content)
+            return r.status_code, tempList, humList, timeList
+        else:
+            tempList=[]
+            humList=[]
+            timeList=[]
+            return r.status_code, tempList, humList, timeList
 
 @externalrestapiApp.route("/envlivejson/<duration>")
 def env_live_json(duration):
@@ -23,11 +38,25 @@ def env_live_json(duration):
 @externalrestapiApp.route("/envhistorical")
 def env_historical(starttime,endtime):
     API_URL = current_app.config['ENVDATA_API_URL_HISTORICAL']
-    r = requests.post(API_URL, data={'starttime': starttime,
+    try:
+        r = requests.post(API_URL, data={'starttime': starttime,
                                      'endtime': endtime
                                      },verify=False)
-    #tempList, humList, timeList = processEnvData(r.content)
-    return processEnvData(r.content)
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.RequestException) as err:
+        tempList=[]
+        humList=[]
+        timeList=[]
+        status_code=999
+        return status_code, tempList, humList, timeList
+    else:
+        if (r.status_code == 200):
+            tempList, humList, timeList = processEnvData(r.content)
+            return r.status_code, tempList, humList, timeList
+        else:
+            tempList=[]
+            humList=[]
+            timeList=[]
+            return r.status_code, tempList, humList, timeList
 
 @externalrestapiApp.route("/fanuclive")
 def fanuc_live(machineID, paraIndex, duration):
@@ -42,11 +71,19 @@ def fanuc_live(machineID, paraIndex, duration):
             'paraIndex':paraIndex,
             'duration': duration
             }, verify=False)
-    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as err:
-        return('Server taking too long. Try again later')
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.RequestException) as err:
+        paramList=[]
+        timeList=[]
+        status_code=999
+        return status_code, paramList, timeList
     else:
-        print("AFTER REQUEST")
-        return processFanucData(r.content)
+        if (r.status_code == 200):
+            paramList, timeList = processFanucData(r.content)
+            return r.status_code, paramList, timeList
+        else:
+            paramList=[]
+            timeList=[]
+            return r.status_code, paramList, timeList
 
 @externalrestapiApp.route("/fanuclivejson/<machineID>/<paraIndex>/<duration>")
 def fanuc_live_json(machineID, paraIndex, duration):
@@ -70,13 +107,26 @@ def fanuc_historical(machineID, paraIndex, starttime, endtime):
     print(paraIndex)
     print(starttime)
     print(endtime)
-    r = requests.post(API_URL, data={
-        'machineID':machineID,
-        'paraIndex':paraIndex,
-        'starttime':starttime,
-        'endtime':endtime
-    },verify=False)
-    return processFanucData(r.content)
+    try:
+        r = requests.post(API_URL, data={
+            'machineID':machineID,
+            'paraIndex':paraIndex,
+            'starttime':starttime,
+            'endtime':endtime
+            },verify=False)
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.RequestException) as err:
+        paramList=[]
+        timeList=[]
+        status_code=999
+        return status_code, paramList, timeList
+    else:
+        if (r.status_code == 200):
+            paramList, timeList = processFanucData(r.content)
+            return r.status_code, paramList, timeList
+        else:
+            paramList = []
+            timeList = []
+            return r.status_code, paramList, timeList
 
 
 def processEnvData(jsonString):

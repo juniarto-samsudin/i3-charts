@@ -6,6 +6,9 @@
     <script>
         ROOT = document.getElementById("myDiv")
         machinename = "{{ machinename|safe }}"
+        machineID= {{ machineID|safe|tojson  }}
+        duration={{ duration|safe }}
+
         freq = {{ freq|tojson|safe }}
         x = {{ dateTime | safe }}
         plotParameter = {{ plotParameter|safe }}
@@ -17,9 +20,46 @@
         title = {{  title|safe|tojson }}
         ylabel = {{ ylabel|safe|tojson }}
 
-        machineID= {{ machineID|safe|tojson  }}
-        paraIndex= {{ paraIndex|safe|tojson }}
-        duration={{ duration|safe }}
+        {% if machinename == 'fanuc' %}
+            paraIndex= {{ paraIndex|safe|tojson }}
+        {% elif machinename == 'moldmaster' %}
+            tipID = "{{ tipID|safe }}"
+            fieldID = "{{ fieldID|safe }}"
+            console.log("LINE LIVE MOLDMASTER")
+        {% endif %}
+
+        {% if sp != none %}
+            setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+            sp= {{ sp|safe }}
+        {% else %}
+            sp = 0
+            setPointValue = x.map(xItem =>{return sp})
+        {% endif %}
+
+        {% if noCL != None %}
+            noCL={{ noCL | safe }}
+        {% else  %}
+            noCL = 0 //SHOW CL AND SP
+        {% endif %}
+
+        {%  if lcl != None %}
+            lcl = {{ lcl | safe | tojson }}
+                {% else %}
+            lcl = 0
+        {% endif %}
+
+        {%  if ucl != None %}
+            ucl = {{ ucl | safe | tojson }}
+                {% else %}
+            ucl = 0
+        {% endif %}
+
+        {% if freq != None %}
+            freq = {{ freq | safe | tojson }}
+                {% else %}
+            freq = 60000
+        {% endif %}
+
 
         drawChart(x,plotParameter,ucl, lcl, setPointValue)
 
@@ -55,9 +95,13 @@
                     dash: 'dash'
                 }
             }
-
-            var data = [parameter, setPoint, CL]
-
+            var data
+            if (noCL == 1){
+                console.log("NOCLSP")
+                data = [parameter]
+            }else {
+                data = [parameter, setPoint, CL]
+            }
             var layout = {
                 title: title,
                 yaxis: {
@@ -70,7 +114,7 @@
                 },
                 xaxis:{
                     title: "Time",
-                    showline: showline = true
+                    showline: showline = false
                 }
             }
 
@@ -80,7 +124,17 @@
 
 
         function reRender(){
-            myurl = "{{ url_for('externalrestapiApplication.fanuc_live_json',machineID=machineID, paraIndex=paraIndex, duration=duration) }}"
+            var myurl
+            switch(machinename){
+                case "fanuc":
+                       myurl = "{{ url_for('externalrestapiApplication.fanuc_live_json',machineID=machineID, paraIndex=paraIndex, duration=duration) }}"
+                       break
+                case "moldmaster":
+                       myurl = "{{ url_for('moldmasterapiApplication.moldmaster_live_json',machineID=machineID, tipID=tipID, fieldID=fieldID, duration=duration) }}"
+                       break
+                default:
+            }
+
             console.log("MYURL: ", myurl)
             $.ajax({
                 type: "GET",
@@ -93,8 +147,13 @@
                 if (machinename == "fanuc"){
                     x = jsondata[1]
                     plotParameter = jsondata[0]
+                } else if (machinename == "moldmaster"){
+                    plotParameter = jsondata[0] //plotparameter
+                    x = jsondata[1] //time
+                    console.log("MOLDMASTER")
+                    console.log("STATUS: ", xhr.status)
                 }
-                setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+                //setPointValue = x.map(xItem =>{return {{ sp|safe }}})
                 drawChart(x,plotParameter,ucl, lcl, setPointValue)
             }).fail(function(xhr, status, error){
                 console.log("AJAX FAILED")

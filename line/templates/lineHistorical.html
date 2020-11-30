@@ -10,9 +10,36 @@
         title = {{ title|safe|tojson }}
         envparameter = {{ envparameter|safe|tojson }}
         ylabel = {{ ylabel|safe|tojson }}
-        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
-        lcl = {{  lcl|safe }}
-        ucl = {{  ucl|safe }}
+            {#
+                setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+                lcl = {{  lcl|safe }}
+                ucl = {{  ucl|safe }}
+        #}
+        {% if sp != none %}
+            setPointValue = x.map(xItem =>{return {{ sp|safe }}})
+            sp= {{ sp|safe }}
+        {% else %}
+            sp = 0
+            setPointValue = x.map(xItem =>{return sp})
+        {% endif %}
+
+        {% if noCL != None %}
+            noCL={{ noCL | safe }}
+        {% else  %}
+            noCL = 0 //SHOW CL AND SP
+        {% endif %}
+
+        {%  if lcl != None %}
+            lcl = {{ lcl | safe | tojson }}
+                {% else %}
+            lcl = 0
+        {% endif %}
+
+        {%  if ucl != None %}
+            ucl = {{ ucl | safe | tojson }}
+                {% else %}
+            ucl = 0
+        {% endif %}
 
         var setPoint =
             {
@@ -46,7 +73,15 @@
             type: 'scatter'
         }
 
-        var data = [readValue, setPoint, CL]
+        var data
+        if (noCL == 1){
+            console.log("NOCLSP")
+            data = [readValue]
+        }else{
+            console.log("YESCLSP")
+            data = [readValue, setPoint, CL]
+        }
+
 
 
 var layout = {

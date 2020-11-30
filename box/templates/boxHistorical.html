@@ -10,9 +10,6 @@
         title = {{ title|safe|tojson }}
         envparameter = {{ envparameter|safe|tojson }}
         ylabel = {{ ylabel|safe|tojson }}
-        setPointValue = x.map(xItem =>{return {{ sp|safe }}})
-        lcl = {{  lcl|safe }}
-        ucl = {{  ucl|safe }}
 
         var readValue = {
             y:plotParameter,

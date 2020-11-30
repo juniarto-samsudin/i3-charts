@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, url_for
 from line.util import readCsvFile, readTorquePower, addSingleQuote
 import requests
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp
+from externalrestapi import externalrestapiApp, moldmasterapi
 import simplejson as json
 
 lineApp = Blueprint("lineApplication", __name__, static_folder="static", template_folder="templates")
@@ -22,15 +22,17 @@ def lineHistorical(machinename):
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
         envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
         starttime = addSingleQuote(starttime)
         endtime = addSingleQuote(endtime)
         print("MACHINEID:", machineID)
         print("paraIndex:", paraIndex)
         print("starttime:", starttime)
         print("endtime:", endtime)
-        paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime),
+        statusCode,paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime),
                                                                   str(endtime))
-        return render_template('lineHistorical.html',
+        if (statusCode == 200):
+            return render_template('lineHistorical.html',
                                dateTime=dateList,
                                plotParameter=paramList,
                                lcl=int(lcl),
@@ -38,8 +40,45 @@ def lineHistorical(machinename):
                                sp=int(sp),
                                title=title,
                                ylabel=ylabel,
-                               envparameter=envparameter
+                               envparameter=envparameter,
+                               noCL=noCL
                                )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+
+    elif machinename == "moldmaster":
+        print("INSIDE LINE MOLDMASTERHISTORICAL")
+        machineID = request.args.get('machineID')
+        tipID = request.args.get('tipID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = moldmasterapi.moldmaster_historical(machineID, tipID, fieldID, starttime,
+                                                                              endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('lineHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=int(lcl),
+                                   ucl=int(ucl),
+                                   sp=int(sp),
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 @lineApp.route("/live/<machinename>")
 def lineLive(machinename):
@@ -56,8 +95,10 @@ def lineLive(machinename):
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
         envparameter = request.args.get('envparameter')
-        paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
-        return render_template('lineLive.html',
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
+        if (statusCode == 200):
+            return render_template('lineLive.html',
                                dateTime=dateList,
                                plotParameter=paramList,
                                title=title,
@@ -70,9 +111,45 @@ def lineLive(machinename):
                                machinename=machinename,
                                machineID=machineID,
                                paraIndex=paraIndex,
-                               duration=duration
+                               duration=duration,
+                               noCL = noCL
                                )
-
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "moldmaster":
+        print("INSIDE LINE LIVE MOLDMASTER")
+        machineID = request.args.get('machineID')
+        tipID = request.args.get('tipID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = moldmasterapi.moldmaster_live(machineID, tipID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('lineLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   duration=duration,
+                                   tipID=tipID,
+                                   fieldID=fieldID,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 
 @lineApp.route("/<machinename>")

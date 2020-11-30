@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from box.util import readCsvFile, addSingleQuote
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp
+from externalrestapi import externalrestapiApp, moldmasterapi
 
 boxApp = Blueprint("boxApplication", __name__, static_folder="static", template_folder="templates")
 
@@ -26,9 +26,10 @@ def boxHistorical(machinename):
         print("paraIndex:", paraIndex)
         print("starttime:", starttime)
         print("endtime:", endtime)
-        paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime),
+        statusCode,paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime),
                                                                   str(endtime))
-        return render_template('boxHistorical.html',
+        if (statusCode == 200):
+            return render_template('boxHistorical.html',
                                dateTime=dateList,
                                plotParameter=paramList,
                                lcl=int(lcl),
@@ -38,6 +39,37 @@ def boxHistorical(machinename):
                                ylabel=ylabel,
                                envparameter=envparameter
                                )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    if machinename == "moldmaster":
+        print("INSIDE BOX MOLDMASTER HISTORICAL ")
+        machineID = request.args.get('machineID')
+        tipID = request.args.get('tipID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = moldmasterapi.moldmaster_historical(machineID, tipID, fieldID, starttime,
+                                                                              endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('histoHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 @boxApp.route("/live/<machinename>")
 def boxLive(machinename):
@@ -54,8 +86,9 @@ def boxLive(machinename):
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
         envparameter = request.args.get('envparameter')
-        paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
-        return render_template('boxLive.html',
+        statusCode, paramList, dateList = externalrestapiApp.fanuc_live(machineID, paraIndex, int(duration))
+        if (statusCode == 200):
+            return render_template('boxLive.html',
                                dateTime=dateList,
                                plotParameter=paramList,
                                title=title,
@@ -70,6 +103,42 @@ def boxLive(machinename):
                                paraIndex=paraIndex,
                                duration=duration
                                )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "moldmaster":
+        print("INSIDE MOLDMASTERLIVE")
+        machineID = request.args.get('machineID')
+        tipID = request.args.get('tipID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = moldmasterapi.moldmaster_live(machineID, tipID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('boxLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   tipID=tipID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 @boxApp.route("/<machinename>")
 def default(machinename):
