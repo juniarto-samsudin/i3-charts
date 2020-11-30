@@ -54,9 +54,11 @@ def moldmaster_live_json(machineID, tipID, fieldID, duration):
         return status_code, paramList, timeList
     else:
         if (r.status_code == 200):
-            print("STATUSCODE200")
-            paramList, timeList = processMoldmasterData(r.content)
+            print("STATUSCODE2000")
+            #paramList, timeList = processMoldmasterData(r.content)
             #return r.status_code, paramList, timeList
+            #data = paramList, timeList
+            #return response(data, 200)
             return response(processMoldmasterData(r.content), 200)
         else:
             print("STATUSCODEERROR")

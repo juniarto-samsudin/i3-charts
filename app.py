@@ -8,6 +8,7 @@ from spc.spcApp import spcApp
 from restdatagenerator.restdatageneratorApp import restdatageneratorApp
 from externalrestapi.externalrestapiApp import externalrestapiApp
 from externalrestapi.moldmasterapi import moldmasterapiApp
+from externalrestapi.mouldfloapi import mouldfloapiApp
 
 app = Flask(__name__)
 app.secret_key = "dev"
@@ -19,6 +20,7 @@ app.register_blueprint(spcApp, url_prefix="/spc")
 app.register_blueprint(restdatageneratorApp,url_prefix="/restdatagenerator")
 app.register_blueprint(externalrestapiApp,url_prefix="/externalrestapi")
 app.register_blueprint(moldmasterapiApp,url_prefix="/moldmasterapi")
+app.register_blueprint(mouldfloapiApp,url_prefix="/mouldfloapi")
 
 app.config.from_object("config.ProductionConfig")
 print(app.config["DB_NAME"])

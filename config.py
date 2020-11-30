@@ -11,7 +11,8 @@ class Config(object):
     FANUC_API_URL_LIVE = "https://i3.zapto.org/bdm01/getFanucDataByDuration.php"
     MOLDMASTER_API_URL_HISTORICAL = "https://i3.zapto.org/bdm01/getMoldMasterDataByTime.php"
     MOLDMASTER_API_URL_LIVE ="https://i3.zapto.org/bdm01/getMoldMasterDataByDuration.php"
-
+    MOULDFLO_API_URL_HISTORICAL = "https://i3.zapto.org/bdm01/getMouldfloDataByTime.php"
+    MOULDFLO_API_URL_LIVE = "https://i3.zapto.org/bdm01/getMouldfloDataByDuration.php"
 
 class ProductionConfig(Config):
     pass
