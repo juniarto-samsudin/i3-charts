@@ -26,6 +26,17 @@
             tipID = "{{ tipID|safe }}"
             fieldID = "{{ fieldID|safe }}"
             console.log("LINE LIVE MOLDMASTER")
+        {% elif machinename == 'mouldflo' %}
+            manifoldID = "{{ manifoldID|safe }}"
+            channelID = "{{ channelID|safe }}"
+            fieldID = "{{ fieldID|safe }}"
+        {% elif machinename == 'motan' %}
+            fieldID = "{{ fieldID|safe }}"
+        {% elif machinename == 'conair' %}
+            fieldID = "{{ fieldID|safe }}"
+        {% elif machinename == 'cda' %}
+            cdaID = "{{ cdaID|safe }}"
+            fieldID = "{{ fieldID|safe }}"
         {% endif %}
 
         {% if sp != none %}
@@ -132,6 +143,18 @@
                 case "moldmaster":
                        myurl = "{{ url_for('moldmasterapiApplication.moldmaster_live_json',machineID=machineID, tipID=tipID, fieldID=fieldID, duration=duration) }}"
                        break
+                case "mouldflo":
+                    myurl = "{{ url_for('mouldfloapiApplication.mouldflo_live_json',machineID=machineID, manifoldID=manifoldID, channelID=channelID, fieldID=fieldID, duration=duration) }}"
+                    break
+                case "motan":
+                    myurl = "{{ url_for('motanapiApplication.motan_live_json',machineID=machineID, fieldID=fieldID, duration=duration) }}"
+                    break
+                case "conair":
+                    myurl = "{{ url_for('conairapiApplication.conair_live_json',machineID=machineID, fieldID=fieldID, duration=duration) }}"
+                    break
+                case "cda":
+                    myurl = "{{ url_for('cdaapiApplication.cda_live_json', cdaID=cdaID, fieldID=fieldID, duration=duration)}}"
+                    break
                 default:
             }
 
@@ -151,6 +174,30 @@
                     plotParameter = jsondata[0] //plotparameter
                     x = jsondata[1] //time
                     console.log("MOLDMASTER")
+                    console.log("STATUS: ", xhr.status)
+                }
+                else if(machinename == "mouldflo"){
+                    plotParameter= jsondata[0]
+                    x = jsondata[1]
+                    console.log("MOULDFLO")
+                    console.log("STATUS: ", xhr.status)
+                }
+                else if(machinename == "motan"){
+                    plotParameter = jsondata[0]
+                    x = jsondata[1]
+                    console.log("MOTAN")
+                    console.log("STATUS: ", xhr.status)
+                }
+                else if(machinename == "conair"){
+                    plotParameter = jsondata[0]
+                    x = jsondata[1]
+                    console.log("MOTAN")
+                    console.log("STATUS: ", xhr.status)
+                }
+                else if(machinename == "cda"){
+                    plotParameter = jsondata[0]
+                    x = jsondata[1]
+                    console.log("CDA")
                     console.log("STATUS: ", xhr.status)
                 }
                 //setPointValue = x.map(xItem =>{return {{ sp|safe }}})

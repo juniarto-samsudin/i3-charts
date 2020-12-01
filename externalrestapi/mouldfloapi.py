@@ -7,7 +7,7 @@ mouldfloapiApp = Blueprint('mouldfloapiApplication', __name__)
 
 @mouldfloapiApp.route("/mouldflolive")
 def mouldflo_live(machineID, manifoldID, channelID, fieldID, duration):
-    API_URL = current_app.config('MOULDFLO_API_URL_LIVE')
+    API_URL = current_app.config['MOULDFLO_API_URL_LIVE']
     print("API_URL: ", API_URL)
     try:
         r = requests.post(API_URL, data={
@@ -31,8 +31,8 @@ def mouldflo_live(machineID, manifoldID, channelID, fieldID, duration):
             return r.status_code, paramList, timeList
 
 @mouldfloapiApp.route("/mouldflolivejson/<machineID>/<manifoldID>/<channelID>/<fieldID>/<duration>")
-def mouldflow_live_json(machineID, manifoldID, channelID, fieldID, duration):
-    API_URL = current_app.config('MOULDFLO_API_URL_LIVE')
+def mouldflo_live_json(machineID, manifoldID, channelID, fieldID, duration):
+    API_URL = current_app.config['MOULDFLO_API_URL_LIVE']
     print("API_URL: ", API_URL)
     try:
         r = requests.post(API_URL, data={
@@ -62,7 +62,7 @@ def mouldflow_live_json(machineID, manifoldID, channelID, fieldID, duration):
 
 @mouldfloapiApp.route("/mouldflohistorical")
 def mouldflo_historical(machineID, manifoldID, channelID, fieldID, starttime, endtime):
-    API_URL = current_app.config('MOULDFLO_API_URL_HISTORICAL')
+    API_URL = current_app.config['MOULDFLO_API_URL_HISTORICAL']
     print("API_URL: ", API_URL)
     try:
         r = requests.post(API_URL, data={

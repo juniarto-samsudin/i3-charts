@@ -2,11 +2,16 @@ from flask import Blueprint, render_template, request, url_for
 from line.util import readCsvFile, readTorquePower, addSingleQuote
 import requests
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp, moldmasterapi
+from externalrestapi import externalrestapiApp, moldmasterapi, mouldfloapi, motanapi, conairapi, cdaapi
 import simplejson as json
 
 lineApp = Blueprint("lineApplication", __name__, static_folder="static", template_folder="templates")
 
+'''
+╦ ╦╦╔═╗╔╦╗╔═╗╦═╗╦╔═╗╔═╗╦  
+╠═╣║╚═╗ ║ ║ ║╠╦╝║║  ╠═╣║  
+╩ ╩╩╚═╝ ╩ ╚═╝╩╚═╩╚═╝╩ ╩╩═╝
+'''
 @lineApp.route("/historical/<machinename>")
 def lineHistorical(machinename):
     #parameters
@@ -67,9 +72,9 @@ def lineHistorical(machinename):
             return render_template('lineHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
-                                   lcl=int(lcl),
-                                   ucl=int(ucl),
-                                   sp=int(sp),
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
                                    title=title,
                                    ylabel=ylabel,
                                    envparameter=envparameter,
@@ -79,6 +84,131 @@ def lineHistorical(machinename):
             return render_template('ConnectionError.html')
         else:
             return render_template('tableNotFound.html')
+    elif machinename == "mouldflo":
+        print("INSIDE MOULDFLO-HISTORICAL")
+        machineID = request.args.get('machineID')
+        manifoldID = request.args.get('manifoldID')
+        channelID = request.args.get('channelID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = mouldfloapi.mouldflo_historical(machineID, manifoldID, channelID, fieldID,
+                                                                          starttime,
+                                                                          endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('lineHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "motan":
+        print("INSIDE MOTAN-HISTORICAL")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = motanapi.motan_historical(machineID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('lineHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "conair":
+        print("INSIDE CONAIR-HISTORICAL")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = conairapi.conair_historical(machineID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('lineHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "cda":
+        print("INSIDE CDA-HISTORICAL")
+        cdaID = request.args.get('cdaID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = cdaapi.cda_historical(cdaID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('lineHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+
+'''
+╦  ╦╦  ╦╔═╗
+║  ║╚╗╔╝║╣ 
+╩═╝╩ ╚╝ ╚═╝
+'''
 
 @lineApp.route("/live/<machinename>")
 def lineLive(machinename):
@@ -144,6 +274,130 @@ def lineLive(machinename):
                                    duration=duration,
                                    tipID=tipID,
                                    fieldID=fieldID,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "mouldflo":
+        print("INSIDE LINE-MOULDFLO-LIVE")
+        machineID = request.args.get('machineID')
+        manifoldID = request.args.get('manifoldID')
+        channelID = request.args.get('channelID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = mouldfloapi.mouldflo_live(machineID, manifoldID, channelID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('lineLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   manifoldID=manifoldID,
+                                   channelID=channelID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "motan":
+        print("INSIDE LINE-MOTAN-LIVE")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = motanapi.motan_live(machineID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('lineLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "conair":
+        print("INSIDE LINE-CONAIR-LIVE")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = conairapi.conair_live(machineID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('lineLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "cda":
+        print("INSIDE LINE-CDA-LIVE")
+        cdaID = request.args.get('cdaID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = cdaapi.cda_live(cdaID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('lineLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   cdaID=cdaID,
+                                   fieldID=fieldID,
+                                   duration=duration,
                                    noCL=noCL
                                    )
         elif (statusCode == 999):

@@ -1,9 +1,15 @@
 from flask import Blueprint, render_template, request
 from spc.util import readCsvFile, readTorquePower, getStatisticFromList, addSingleQuote
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp, moldmasterapi
+from externalrestapi import externalrestapiApp, moldmasterapi, mouldfloapi, motanapi, conairapi, cdaapi
 
 spcApp = Blueprint("spcApplication", __name__, static_folder="static", template_folder="templates")
+
+'''
+╦ ╦╦╔═╗╔╦╗╔═╗╦═╗╦╔═╗╔═╗╦  
+╠═╣║╚═╗ ║ ║ ║╠╦╝║║  ╠═╣║  
+╩ ╩╩╚═╝ ╩ ╚═╝╩╚═╩╚═╝╩ ╩╩═╝
+'''
 
 @spcApp.route("/historical/<machinename>")
 def spcHistorical(machinename):
@@ -117,7 +123,149 @@ def spcHistorical(machinename):
             return render_template('ConnectionError.html')
         else:
             return render_template('tableNotFound.html')
-
+    elif machinename == "mouldflo":
+        print("INSIDE MOULDFLO-HISTORICAL")
+        machineID = request.args.get('machineID')
+        manifoldID = request.args.get('manifoldID')
+        channelID = request.args.get('channelID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = mouldfloapi.mouldflo_historical(machineID, manifoldID, channelID, fieldID, starttime,
+                                                                              endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+            print('after statistics')
+            return render_template('spcHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   StdDev=StdDev,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   xNormalDistList=xNormDistList,
+                                   yNormalDistList=yNormDistList,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "motan":
+        print("INSIDE MOTAN-HISTORICAL")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = motanapi.motan_historical(machineID,fieldID,starttime,endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+            print('after statistics')
+            return render_template('spcHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   StdDev=StdDev,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   xNormalDistList=xNormDistList,
+                                   yNormalDistList=yNormDistList,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "conair":
+        print("INSIDE CONAIR-HISTORICAL")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = conairapi.conair_historical(machineID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+            print('after statistics')
+            return render_template('spcHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   StdDev=StdDev,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   xNormalDistList=xNormDistList,
+                                   yNormalDistList=yNormDistList,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "cda":
+        print("INSIDE CDA-HISTORICAL")
+        cdaID = request.args.get('cdaID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = cdaapi.cda_historical(cdaID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+            print('after statistics')
+            return render_template('spcHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   StdDev=StdDev,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   xNormalDistList=xNormDistList,
+                                   yNormalDistList=yNormDistList,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+'''
+╦  ╦╦  ╦╔═╗
+║  ║╚╗╔╝║╣ 
+╩═╝╩ ╚╝ ╚═╝
+'''
 @spcApp.route("/live/<machinename>")
 def spcLive(machinename):
     print("SPC-LIVE")
@@ -230,7 +378,130 @@ def spcLive(machinename):
             return render_template('ConnectionError.html')
         else:
             return render_template('tableNotFound.html')
-
+    elif machinename == "mouldflo":
+        print("INSIDE MOULDFLO-LIVE")
+        machineID = request.args.get('machineID')
+        manifoldID = request.args.get('manifoldID')
+        channelID = request.args.get('channelID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = mouldfloapi.mouldflo_live(machineID, manifoldID, channelID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('spcLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   manifoldID=manifoldID,
+                                   channelID=channelID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "motan":
+        print("INSIDE MOTAN-LIVE")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = motanapi.motan_live(machineID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('spcLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "conair":
+        print("INSIDE CONAIR-LIVE")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = conairapi.conair_live(machineID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('spcLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "cda":
+        print("INSIDE CDA-LIVE")
+        cdaID = request.args.get('cdaID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = cdaapi.cda_live(cdaID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('spcLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   cdaID = cdaID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 @spcApp.route("/<machinename>")
 def default(machinename):

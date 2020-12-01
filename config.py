@@ -13,6 +13,12 @@ class Config(object):
     MOLDMASTER_API_URL_LIVE ="https://i3.zapto.org/bdm01/getMoldMasterDataByDuration.php"
     MOULDFLO_API_URL_HISTORICAL = "https://i3.zapto.org/bdm01/getMouldfloDataByTime.php"
     MOULDFLO_API_URL_LIVE = "https://i3.zapto.org/bdm01/getMouldfloDataByDuration.php"
+    MOTAN_API_URL_HISTORICAL ="https://i3.zapto.org/bdm01/getMotanDataByTime.php"
+    MOTAN_API_URL_LIVE="https://i3.zapto.org/bdm01/getMotanDataByDuration.php"
+    CONAIR_API_URL_HISTORICAL = "https://i3.zapto.org/bdm01/getConairDataByTime.php"
+    CONAIR_API_URL_LIVE="https://i3.zapto.org/bdm01/getConairDataByDuration.php"
+    CDA_API_URL_HISTORICAL = "https://i3.zapto.org/bdm01/getCDADataByTime.php"
+    CDA_API_URL_LIVE = "https://i3.zapto.org/bdm01/getCDADataByDuration.php"
 
 class ProductionConfig(Config):
     pass

@@ -1,10 +1,15 @@
 from flask import Blueprint, render_template, request
 from box.util import readCsvFile, addSingleQuote
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp, moldmasterapi
+from externalrestapi import externalrestapiApp, moldmasterapi, mouldfloapi, motanapi, conairapi, cdaapi
 
 boxApp = Blueprint("boxApplication", __name__, static_folder="static", template_folder="templates")
 
+'''
+╦ ╦╦╔═╗╔╦╗╔═╗╦═╗╦╔═╗╔═╗╦  
+╠═╣║╚═╗ ║ ║ ║╠╦╝║║  ╠═╣║  
+╩ ╩╩╚═╝ ╩ ╚═╝╩╚═╩╚═╝╩ ╩╩═╝
+'''
 @boxApp.route("/historical/<machinename>")
 def boxHistorical(machinename):
     # parameters
@@ -43,7 +48,7 @@ def boxHistorical(machinename):
             return render_template('ConnectionError.html')
         else:
             return render_template('tableNotFound.html')
-    if machinename == "moldmaster":
+    elif machinename == "moldmaster":
         print("INSIDE BOX MOLDMASTER HISTORICAL ")
         machineID = request.args.get('machineID')
         tipID = request.args.get('tipID')
@@ -59,7 +64,7 @@ def boxHistorical(machinename):
                                                                               endtime)
         if (statusCode == 200):
             print('status-code: ', statusCode)
-            return render_template('histoHistorical.html',
+            return render_template('boxHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
                                    title=title,
@@ -70,7 +75,131 @@ def boxHistorical(machinename):
             return render_template('ConnectionError.html')
         else:
             return render_template('tableNotFound.html')
+    elif machinename == "mouldflo":
+        print("INSIDE  BOX MOULDFLO-HISTORICAL")
+        machineID = request.args.get('machineID')
+        manifoldID = request.args.get('manifoldID')
+        channelID = request.args.get('channelID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = mouldfloapi.mouldflo_historical(machineID, manifoldID, channelID, fieldID,
+                                                                          starttime,
+                                                                          endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('boxHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "motan":
+        print("INSIDE  BOX MOTAN-HISTORICAL")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = motanapi.motan_historical(machineID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('boxHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "conair":
+        print("INSIDE BOX CONAIR-HISTORICAL")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = conairapi.conair_historical(machineID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('boxHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "cda":
+        print("INSIDE  BOX CDA-HISTORICAL")
+        cdaID = request.args.get('cdaID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = cdaapi.cda_historical(cdaID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('boxHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
+'''
+╦  ╦╦  ╦╔═╗
+║  ║╚╗╔╝║╣ 
+╩═╝╩ ╚╝ ╚═╝
+'''
 @boxApp.route("/live/<machinename>")
 def boxLive(machinename):
     # parameters
@@ -131,6 +260,130 @@ def boxLive(machinename):
                                    machinename=machinename,
                                    machineID=machineID,
                                    tipID=tipID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "mouldflo":
+        print("INSIDE BOX-MOULDFLO-LIVE")
+        machineID = request.args.get('machineID')
+        manifoldID = request.args.get('manifoldID')
+        channelID = request.args.get('channelID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = mouldfloapi.mouldflo_live(machineID, manifoldID, channelID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('boxLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   manifoldID=manifoldID,
+                                   channelID=channelID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "motan":
+        print("INSIDE BOX-MOTAN-LIVE")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = motanapi.motan_live(machineID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('boxLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "conair":
+        print("INSIDE BOX-CONAIR-LIVE")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = conairapi.conair_live(machineID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('boxLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "cda":
+        print("INSIDE BOX-CDA-LIVE")
+        cdaID = request.args.get('cdaID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = cdaapi.cda_live(cdaID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('boxLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   cdaID=cdaID,
                                    fieldID=fieldID,
                                    duration=duration,
                                    noCL=noCL
