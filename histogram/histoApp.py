@@ -6,6 +6,12 @@ from externalrestapi import externalrestapiApp, moldmasterapi, mouldfloapi, mota
 
 histoApp = Blueprint("histoApplication", __name__, static_folder="static", template_folder="templates")
 
+'''
+╦ ╦╦╔═╗╔╦╗╔═╗╦═╗╦╔═╗╔═╗╦  
+╠═╣║╚═╗ ║ ║ ║╠╦╝║║  ╠═╣║  
+╩ ╩╩╚═╝ ╩ ╚═╝╩╚═╩╚═╝╩ ╩╩═╝
+'''
+
 @histoApp.route("/historical/<machinename>")
 def histoHistorical(machinename):
     # parameters
@@ -65,7 +71,7 @@ def histoHistorical(machinename):
                                                                               endtime)
         if (statusCode == 200):
             print('status-code: ', statusCode)
-            return render_template('boxHistorical.html',
+            return render_template('histoHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
                                    title=title,
@@ -76,6 +82,116 @@ def histoHistorical(machinename):
             return render_template('ConnectionError.html')
         else:
             return render_template('tableNotFound.html')
+    elif machinename == "mouldflo":
+        print("INSIDE  HISTOGRAM MOULDFLO-HISTORICAL")
+        machineID = request.args.get('machineID')
+        manifoldID = request.args.get('manifoldID')
+        channelID = request.args.get('channelID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = mouldfloapi.mouldflo_historical(machineID, manifoldID, channelID, fieldID,
+                                                                          starttime,
+                                                                          endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('histoHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "motan":
+        print("INSIDE  HISTOGRAM MOTAN-HISTORICAL")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = motanapi.motan_historical(machineID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('histoHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "conair":
+        print("INSIDE HISTOGRAM CONAIR-HISTORICAL")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("MACHINEID:", machineID)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = conairapi.conair_historical(machineID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('histoHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "cda":
+        print("INSIDE  HISTOGRAM CDA-HISTORICAL")
+        cdaID = request.args.get('cdaID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        noCL = request.args.get('noCL')
+        starttime = addSingleQuote(starttime)
+        endtime = addSingleQuote(endtime)
+        print("starttime:", starttime)
+        print("endtime:", endtime)
+        statusCode, paramList, dateList = cdaapi.cda_historical(cdaID, fieldID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            return render_template('histoHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   envparameter=envparameter
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+        return 0
+
+'''
+╦  ╦╦  ╦╔═╗
+║  ║╚╗╔╝║╣ 
+╩═╝╩ ╚╝ ╚═╝
+'''
 
 @histoApp.route("/live/<machinename>")
 def histoLive(machinename):
@@ -137,6 +253,132 @@ def histoLive(machinename):
                                    machinename=machinename,
                                    machineID=machineID,
                                    tipID=tipID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "mouldflo":
+        print("INSIDE HISTOGRAM-MOULDFLO-LIVE")
+        machineID = request.args.get('machineID')
+        manifoldID = request.args.get('manifoldID')
+        channelID = request.args.get('channelID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = mouldfloapi.mouldflo_live(machineID, manifoldID, channelID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('histoLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   manifoldID=manifoldID,
+                                   channelID=channelID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "motan":
+        print("INSIDE HISTOGRAM-MOTAN-LIVE")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = motanapi.motan_live(machineID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('histoLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+        return 0
+    elif machinename == "conair":
+        print("INSIDE HISTOGRAM-CONAIR-LIVE")
+        machineID = request.args.get('machineID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = conairapi.conair_live(machineID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('histoLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+        return 0
+    elif machinename == "cda":
+        print("INSIDE HISTOGRAM-CDA-LIVE")
+        cdaID = request.args.get('cdaID')
+        fieldID = request.args.get('fieldID')
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = cdaapi.cda_live(cdaID, fieldID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('histoLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   cdaID=cdaID,
                                    fieldID=fieldID,
                                    duration=duration,
                                    noCL=noCL
