@@ -69,6 +69,8 @@ def spcHistorical(machinename):
         statusCode, paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime), str(endtime))
         #StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
         if (statusCode == 200):
+            if len(paramList) == 0:
+                return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
             return render_template('spcHistorical.html',
                                dateTime=dateList,
@@ -103,6 +105,8 @@ def spcHistorical(machinename):
         statusCode, paramList, dateList = moldmasterapi.moldmaster_historical(machineID, tipID, fieldID, starttime, endtime)
         if (statusCode == 200):
             print('status-code: ', statusCode)
+            if len(paramList) == 0:
+                return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
             print('after statistics')
             return render_template('spcHistorical.html',
@@ -140,6 +144,8 @@ def spcHistorical(machinename):
                                                                               endtime)
         if (statusCode == 200):
             print('status-code: ', statusCode)
+            if len(paramList) == 0:
+                return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
             print('after statistics')
             return render_template('spcHistorical.html',
@@ -174,6 +180,8 @@ def spcHistorical(machinename):
         statusCode, paramList, dateList = motanapi.motan_historical(machineID,fieldID,starttime,endtime)
         if (statusCode == 200):
             print('status-code: ', statusCode)
+            if len(paramList) == 0:
+                return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
             print('after statistics')
             return render_template('spcHistorical.html',
@@ -208,6 +216,8 @@ def spcHistorical(machinename):
         statusCode, paramList, dateList = conairapi.conair_historical(machineID, fieldID, starttime, endtime)
         if (statusCode == 200):
             print('status-code: ', statusCode)
+            if len(paramList) == 0:
+                return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
             print('after statistics')
             return render_template('spcHistorical.html',
@@ -241,6 +251,8 @@ def spcHistorical(machinename):
         statusCode, paramList, dateList = cdaapi.cda_historical(cdaID, fieldID, starttime, endtime)
         if (statusCode == 200):
             print('status-code: ', statusCode)
+            if len(paramList) == 0:
+                return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
             print('after statistics')
             return render_template('spcHistorical.html',
