@@ -137,6 +137,9 @@
         function reRender(){
             var myurl
             switch(machinename){
+                case "envdata":
+                    myurl = "{{ url_for('externalrestapiApplication.env_live_json',duration=duration) }}"
+                    break
                 case "fanuc":
                        myurl = "{{ url_for('externalrestapiApplication.fanuc_live_json',machineID=machineID, paraIndex=paraIndex, duration=duration) }}"
                        break
@@ -167,7 +170,15 @@
                 console.log("RESPONSE: ", jsondata);
                 var x
                 var plotParameter
-                if (machinename == "fanuc"){
+                if (machinename == "envdata"){
+                    x = jsondata[2]
+                    if (envparameter == "temperature"){
+                        plotParameter = jsondata[0]}
+                    else{
+                        plotParameter = jsondata[1]
+                    }
+                }
+                else if (machinename == "fanuc"){
                     x = jsondata[1]
                     plotParameter = jsondata[0]
                 } else if (machinename == "moldmaster"){

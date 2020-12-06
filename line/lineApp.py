@@ -23,7 +23,41 @@ def lineHistorical(machinename):
     lcl = request.args.get('lcl')
     ucl = request.args.get('ucl')
     sp = request.args.get('sp')
-    if machinename == "fanuc":
+    if machinename == "envdata":
+        print("INSIDE ENVDATA LINE HISTORICAL")
+        envparameter = request.args.get('envparameter')  # humidity or temperature
+        noCL = request.args.get('noCL')
+        statusCode, tempList, humList, dateList = externalrestapiApp.env_historical(starttime, endtime)
+        if (statusCode == 200):
+            if envparameter == "temperature":
+                return render_template('lineHistorical.html',
+                                       dateTime=dateList,
+                                       plotParameter=tempList,
+                                       lcl=int(lcl),
+                                       ucl=int(ucl),
+                                       sp=int(sp),
+                                       title=title,
+                                       ylabel=ylabel,
+                                       envparameter=envparameter,
+                                       noCL=noCL
+                                       )
+            elif envparameter == "humidity":
+                return render_template('lineHistorical.html',
+                                       dateTime=dateList,
+                                       plotParameter=humList,
+                                       lcl=int(lcl),
+                                       ucl=int(ucl),
+                                       sp=int(sp),
+                                       title=title,
+                                       ylabel=ylabel,
+                                       envparameter=envparameter,
+                                       noCL=noCL
+                                       )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "fanuc":
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
         envparameter = request.args.get('envparameter')
@@ -221,7 +255,50 @@ def lineLive(machinename):
     ucl = request.args.get('ucl')
     sp = request.args.get('sp')
     freq = request.args.get('freq')
-    if machinename == "fanuc":
+    if machinename == "envdata":
+        print("INSIDE LINE ENV-DATA LIVE")
+        envparameter = request.args.get('envparameter')  # humidity or temperature
+        noCL = request.args.get('noCL')
+        statusCode, tempList, humList, dateList = externalrestapiApp.env_live(int(duration))
+        if envparameter == "temperature":
+            if (statusCode == 200):
+                return render_template('lineLive.html',
+                                       dateTime=dateList,
+                                       plotParameter=tempList,
+                                       title=title,
+                                       ylabel=ylabel,
+                                       freq=freq,
+                                       lcl=lcl,
+                                       ucl=ucl,
+                                       sp=sp,
+                                       envparameter=envparameter,
+                                       machinename=machinename,
+                                       duration=duration,
+                                       noCL=noCL)
+            elif (statusCode == 999):
+                return render_template('ConnectionError.html')
+            else:
+                return render_template('tableNotFound.html')
+        elif envparameter == "humidity":
+            if (statusCode == 200):
+                return render_template('lineLive.html',
+                                       dateTime=dateList,
+                                       plotParameter=humList,
+                                       title=title,
+                                       ylabel=ylabel,
+                                       freq=freq,
+                                       lcl=lcl,
+                                       ucl=ucl,
+                                       sp=sp,
+                                       envparameter=envparameter,
+                                       machinename=machinename,
+                                       duration=duration,
+                                       noCL=noCL)
+            elif (statusCode == 999):
+                return render_template('ConnectionError.html')
+            else:
+                return render_template('tableNotFound.html')
+    elif machinename == "fanuc":
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
         envparameter = request.args.get('envparameter')

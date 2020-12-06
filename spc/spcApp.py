@@ -24,11 +24,16 @@ def spcHistorical(machinename):
     sp = request.args.get('sp')
 
     if machinename == "envdata":
+        print("INSIDE ENVDATA SPC HISTORICAL")
         envparameter = request.args.get('envparameter') #humidity or temperature
-        tempList, humList, dateList = externalrestapiApp.env_historical(starttime, endtime)
-        if envparameter == "temperature":
-            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(tempList)
-            return render_template('spcHistorical.html',
+        noCL = request.args.get('noCL')
+        statusCode, tempList, humList, dateList = externalrestapiApp.env_historical(starttime, endtime)
+        if (statusCode == 200):
+            if envparameter == "temperature":
+                if len(tempList) == 0:
+                    return render_template('DataNotFound.html')
+                StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(tempList)
+                return render_template('spcHistorical.html',
                                     dateTime=dateList,
                                     plotParameter=tempList,
                                     StdDev = StdDev,
@@ -39,11 +44,14 @@ def spcHistorical(machinename):
                                     ylabel=ylabel,
                                     xNormalDistList=xNormDistList,
                                     yNormalDistList=yNormDistList,
-                                    envparameter = envparameter
+                                    envparameter = envparameter,
+                                    noCL = noCL
                                    )
-        elif envparameter == "humidity":
-            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(humList)
-            return render_template('spcHistorical.html',
+            elif envparameter == "humidity":
+                if len(humList) == 0:
+                    return render_template('DataNotFound.html')
+                StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(humList)
+                return render_template('spcHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=humList,
                                    StdDev=StdDev,
@@ -54,7 +62,13 @@ def spcHistorical(machinename):
                                    ylabel=ylabel,
                                    xNormalDistList=xNormDistList,
                                    yNormalDistList=yNormDistList,
-                                   envparameter=envparameter)
+                                   envparameter=envparameter,
+                                   noCL = noCL
+                                       )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
     elif machinename == "fanuc":
         machineID = request.args.get('machineID')
         paraIndex = request.args.get('paraIndex')
@@ -294,6 +308,7 @@ def spcLive(machinename):
     if machinename == "envdata":
         print("LIVE-ENVDATA")
         envparameter = request.args.get('envparameter')  # humidity or temperature
+        noCL = request.args.get('noCL')
         statusCode, tempList, humList, dateList = externalrestapiApp.env_live(int(duration))
         if envparameter == "temperature":
             if (statusCode == 200):
@@ -308,7 +323,8 @@ def spcLive(machinename):
                                    sp=sp,
                                    envparameter=envparameter,
                                    machinename=machinename,
-                                   duration=duration)
+                                   duration=duration,
+                                   noCL = noCL    )
             elif(statusCode == 999):
                 return render_template('ConnectionError.html')
             else:
@@ -326,7 +342,8 @@ def spcLive(machinename):
                                    sp=sp,
                                    envparameter=envparameter,
                                    machinename=machinename,
-                                   duration=duration)
+                                   duration=duration,
+                                   noCL = noCL    )
             elif(statusCode == 999):
                 return render_template('ConnectionError.html')
             else:
