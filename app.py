@@ -28,8 +28,12 @@ app.register_blueprint(motanapiApp,url_prefix="/motanapi")
 app.register_blueprint(conairapiApp,url_prefix="/conairapi")
 app.register_blueprint(cdaapiApp, url_prefix="/cdaapi")
 
-app.config.from_object("config.ProductionConfig")
-print(app.config["DB_NAME"])
+try:
+    #GET FROM EXTERNAL ENV VARIABLE SETTINGS
+    app.config.from_envvar('MYAPPLICATIONSETTING')
+except:
+    #FALL BACK USING config.py
+    app.config.from_object("config.ProductionConfig")
 
 @app.route('/')
 def default():
