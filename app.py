@@ -30,9 +30,11 @@ app.register_blueprint(cdaapiApp, url_prefix="/cdaapi")
 
 try:
     #GET FROM EXTERNAL ENV VARIABLE SETTINGS
+    print("USING ENVIRONMENT VARIABLE")
     app.config.from_envvar('MYAPPLICATIONSETTING')
 except:
     #FALL BACK USING config.py
+    print("USING CONFIG.PY")
     app.config.from_object("config.ProductionConfig")
 
 @app.route('/')
