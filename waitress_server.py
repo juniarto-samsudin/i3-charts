@@ -7,6 +7,12 @@ from base.baseApp import baseApp
 from spc.spcApp import spcApp
 from restdatagenerator.restdatageneratorApp import restdatageneratorApp
 from externalrestapi.externalrestapiApp import externalrestapiApp
+from externalrestapi.moldmasterapi import moldmasterapiApp
+from externalrestapi.mouldfloapi import mouldfloapiApp
+from externalrestapi.motanapi import motanapiApp
+from externalrestapi.conairapi import conairapiApp
+from externalrestapi.cdaapi import cdaapiApp
+
 from waitress import serve
 
 app = Flask(__name__)
@@ -18,6 +24,11 @@ app.register_blueprint(baseApp, url_prefix="/base")
 app.register_blueprint(spcApp, url_prefix="/spc")
 app.register_blueprint(restdatageneratorApp,url_prefix="/restdatagenerator")
 app.register_blueprint(externalrestapiApp,url_prefix="/externalrestapi")
+app.register_blueprint(moldmasterapiApp,url_prefix="/moldmasterapi")
+app.register_blueprint(mouldfloapiApp,url_prefix="/mouldfloapi")
+app.register_blueprint(motanapiApp,url_prefix="/motanapi")
+app.register_blueprint(conairapiApp,url_prefix="/conairapi")
+app.register_blueprint(cdaapiApp, url_prefix="/cdaapi")
 
 try:
     #GET FROM EXTERNAL ENV VARIABLE SETTINGS
