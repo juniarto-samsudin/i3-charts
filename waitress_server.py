@@ -19,8 +19,17 @@ app.register_blueprint(spcApp, url_prefix="/spc")
 app.register_blueprint(restdatageneratorApp,url_prefix="/restdatagenerator")
 app.register_blueprint(externalrestapiApp,url_prefix="/externalrestapi")
 
-app.config.from_object("config.ProductionConfig")
-print(app.config["DB_NAME"])
+try:
+    #GET FROM EXTERNAL ENV VARIABLE SETTINGS
+    print("USING ENVIRONMENT VARIABLE")
+    app.config.from_envvar('MYAPPLICATIONSETTING')
+except:
+    #FALL BACK USING config.py
+    print("USING CONFIG.PY")
+    app.config.from_object("config.ProductionConfig")
+
+#app.config.from_object("config.ProductionConfig")
+#print(app.config["DB_NAME"])
 
 @app.route('/')
 def default():
