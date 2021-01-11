@@ -45,8 +45,8 @@ except:
 @app.route('/')
 def default():
     dateTime, readValue,upperLimit, lowerLimit, setPoint = readCsvFile('temperature.csv')
-    print (readValue)
-    print ("x:",dateTime[0])
+    #print (readValue)
+    #print ("x:",dateTime[0])
     return render_template('iframe.html')
 
 

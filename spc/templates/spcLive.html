@@ -17,11 +17,11 @@
 
         {% if machinename == 'fanuc' %}
             paraIndex= "{{ paraIndex|safe }}"
-            console.log("HELLO FANUC")
+            //console.log("HELLO FANUC")
         {% elif machinename == 'moldmaster' %}
             tipID = "{{ tipID|safe }}"
             fieldID = "{{ fieldID|safe }}"
-            console.log("HELLO MOLDMASTER")
+            //console.log("HELLO MOLDMASTER")
         {% elif machinename == 'mouldflo' %}
             manifoldID = "{{ manifoldID|safe }}"
             channelID = "{{ channelID|safe }}"
@@ -67,12 +67,12 @@
             freq = 60000
         {% endif %}
 
-        console.log("MACHINENAME: ", machinename)
-        console.log("UPPERLIMIT: ", ucl)
-        console.log("LOWERLIMIT: ", lcl)
-        console.log("SETPOINT: ", sp)
-        console.log("DURATION: ", duration)
-        console.log("FREQ: ", freq)
+        //console.log("MACHINENAME: ", machinename)
+        //console.log("UPPERLIMIT: ", ucl)
+        //console.log("LOWERLIMIT: ", lcl)
+        //console.log("SETPOINT: ", sp)
+        //console.log("DURATION: ", duration)
+        //console.log("FREQ: ", freq)
         {#  setPointValue = x.map(xItem =>{return {{ sp|safe }}}) #}
 
         {#
@@ -90,7 +90,7 @@
         drawChart(x,plotParameter,ucl, lcl, setPointValue)
 
         function drawChart(x,plotParameter, ucl, lcl, setPointValue){
-            console.log("DRAWING CHART")
+            //console.log("DRAWING CHART")
             var parameter = {
                 x: x,
                 y: plotParameter,
@@ -143,10 +143,10 @@
             //var data = [parameter, upperLimitLine, lowerLimitLine, histo]
             var data
             if (noCL == 1) {
-                console.log("NOCLSP")
+                //console.log("NOCLSP")
                 data = [parameter, histo]
             }else{ //NO CL and SP
-                console.log("YESCLSP")
+                //console.log("YESCLSP")
                 data = [parameter, setPoint, CL, histo]
             }
             var layout = {
@@ -186,7 +186,7 @@
             for (var i in resp.parameters){
                 var key = i;
                 keyParameter.push(key)
-                console.log("KEY: ", key) //temperature
+                //console.log("KEY: ", key) //temperature
             }
             return keyParameter
         }
@@ -194,9 +194,9 @@
         function reRender(){
             {#myurl={{ url_for('restdatageneratorApplication.default') }}
             <a href = {{ url_for('find_question' ,question_id=1) }}>Question 1</a>#}
-            console.log("INSIDE RERENDER")
-            console.log("MACHINENAME: ", machinename)
-            console.log("DURATION: ", duration)
+            //console.log("INSIDE RERENDER")
+            //console.log("MACHINENAME: ", machinename)
+            //console.log("DURATION: ", duration)
             var myurl
             switch(machinename){
                 case "envdata":
@@ -222,13 +222,13 @@
                     break
                 default:
             }
-            console.log("MYURL: ", myurl)
+            //console.log("MYURL: ", myurl)
             $.ajax({
                 type: "GET",
                 url: myurl,
                 dataType: 'json'
             }).done(function(jsondata, status, xhr){
-                console.log("RESPONSE: ", jsondata);
+                //console.log("RESPONSE: ", jsondata);
                 //x = jsondata[2]
                 var x
                 var plotParameter
@@ -247,32 +247,32 @@
                 else if (machinename == "moldmaster"){
                     plotParameter = jsondata[0] //plotparameter
                     x = jsondata[1] //time
-                    console.log("MOLDMASTER")
-                    console.log("STATUS: ", xhr.status)
+                    //console.log("MOLDMASTER")
+                    //console.log("STATUS: ", xhr.status)
                 }
                 else if(machinename == "mouldflo"){
                     plotParameter= jsondata[0]
                     x = jsondata[1]
-                    console.log("MOULDFLO")
-                    console.log("STATUS: ", xhr.status)
+                    //console.log("MOULDFLO")
+                    //console.log("STATUS: ", xhr.status)
                 }
                 else if(machinename == "motan"){
                     plotParameter = jsondata[0]
                     x = jsondata[1]
-                    console.log("MOTAN")
-                    console.log("STATUS: ", xhr.status)
+                    //console.log("MOTAN")
+                    //console.log("STATUS: ", xhr.status)
                 }
                 else if(machinename == "conair"){
                     plotParameter = jsondata[0]
                     x = jsondata[1]
-                    console.log("MOTAN")
-                    console.log("STATUS: ", xhr.status)
+                    //console.log("MOTAN")
+                    //console.log("STATUS: ", xhr.status)
                 }
                 else if(machinename == "cda"){
                     plotParameter = jsondata[0]
                     x = jsondata[1]
-                    console.log("CDA")
-                    console.log("STATUS: ", xhr.status)
+                    //console.log("CDA")
+                    //console.log("STATUS: ", xhr.status)
                 }
                 //console.log("TYPE OF X", typeof x)
                 //console.log("LENGTH OF X", x.length)

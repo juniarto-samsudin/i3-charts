@@ -485,8 +485,8 @@ def default(machinename):
         return render_template('histoTorquePowerLastHour.html', response=mystring, title=title, freq=freq)
     if (machinename == 'testcsv'):
         dateTime, readValue, upperLimit, lowerLimit, setPoint = readCsvFile('temperature.csv')
-        print(readValue)
-        print("x:", dateTime[0])
+        #print(readValue)
+        #print("x:", dateTime[0])
         return render_template('histopage.html', readValue=readValue)
     elif (machinename == 'fanuc'):
         dateTime, readTorque, readPower, torqueStdDev, powerStdDev, torqueMean, powerMean,xList, yList = readTorquePower('fanuc-torque-power.csv')

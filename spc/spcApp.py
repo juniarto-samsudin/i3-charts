@@ -24,7 +24,7 @@ def spcHistorical(machinename):
     sp = request.args.get('sp')
 
     if machinename == "envdata":
-        print("INSIDE ENVDATA SPC HISTORICAL")
+        #print("INSIDE ENVDATA SPC HISTORICAL")
         envparameter = request.args.get('envparameter') #humidity or temperature
         noCL = request.args.get('noCL')
         statusCode, tempList, humList, dateList = externalrestapiApp.env_historical(starttime, endtime)
@@ -76,10 +76,10 @@ def spcHistorical(machinename):
         noCL = request.args.get('noCL')
         starttime = addSingleQuote(starttime)
         endtime = addSingleQuote(endtime)
-        print("MACHINEID:", machineID)
-        print("paraIndex:", paraIndex)
-        print("starttime:", starttime)
-        print("endtime:", endtime)
+        #print("MACHINEID:", machineID)
+        #print("paraIndex:", paraIndex)
+        #print("starttime:", starttime)
+        #print("endtime:", endtime)
         statusCode, paramList, dateList = externalrestapiApp.fanuc_historical(int(machineID), int(paraIndex), str(starttime), str(endtime))
         #StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
         if (statusCode == 200):
@@ -105,7 +105,7 @@ def spcHistorical(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "moldmaster":
-        print("INSIDE MOLDMASTERHISTORICAL")
+        #print("INSIDE MOLDMASTERHISTORICAL")
         machineID = request.args.get('machineID')
         tipID = request.args.get('tipID')
         fieldID = request.args.get('fieldID')
@@ -113,16 +113,16 @@ def spcHistorical(machinename):
         noCL = request.args.get('noCL')
         starttime = addSingleQuote(starttime)
         endtime = addSingleQuote(endtime)
-        print("MACHINEID:", machineID)
-        print("starttime:", starttime)
-        print("endtime:", endtime)
+        #print("MACHINEID:", machineID)
+        #print("starttime:", starttime)
+        #print("endtime:", endtime)
         statusCode, paramList, dateList = moldmasterapi.moldmaster_historical(machineID, tipID, fieldID, starttime, endtime)
         if (statusCode == 200):
-            print('status-code: ', statusCode)
+            #print('status-code: ', statusCode)
             if len(paramList) == 0:
                 return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
-            print('after statistics')
+            #print('after statistics')
             return render_template('spcHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -142,7 +142,7 @@ def spcHistorical(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "mouldflo":
-        print("INSIDE MOULDFLO-HISTORICAL")
+        #print("INSIDE MOULDFLO-HISTORICAL")
         machineID = request.args.get('machineID')
         manifoldID = request.args.get('manifoldID')
         channelID = request.args.get('channelID')
@@ -151,17 +151,17 @@ def spcHistorical(machinename):
         noCL = request.args.get('noCL')
         starttime = addSingleQuote(starttime)
         endtime = addSingleQuote(endtime)
-        print("MACHINEID:", machineID)
-        print("starttime:", starttime)
-        print("endtime:", endtime)
+        #print("MACHINEID:", machineID)
+        #print("starttime:", starttime)
+        #print("endtime:", endtime)
         statusCode, paramList, dateList = mouldfloapi.mouldflo_historical(machineID, manifoldID, channelID, fieldID, starttime,
                                                                               endtime)
         if (statusCode == 200):
-            print('status-code: ', statusCode)
+            #print('status-code: ', statusCode)
             if len(paramList) == 0:
                 return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
-            print('after statistics')
+            #print('after statistics')
             return render_template('spcHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -181,23 +181,23 @@ def spcHistorical(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "motan":
-        print("INSIDE MOTAN-HISTORICAL")
+        #print("INSIDE MOTAN-HISTORICAL")
         machineID = request.args.get('machineID')
         fieldID = request.args.get('fieldID')
         envparameter = request.args.get('envparameter')
         noCL = request.args.get('noCL')
         starttime = addSingleQuote(starttime)
         endtime = addSingleQuote(endtime)
-        print("MACHINEID:", machineID)
-        print("starttime:", starttime)
-        print("endtime:", endtime)
+        #print("MACHINEID:", machineID)
+        #print("starttime:", starttime)
+        #print("endtime:", endtime)
         statusCode, paramList, dateList = motanapi.motan_historical(machineID,fieldID,starttime,endtime)
         if (statusCode == 200):
-            print('status-code: ', statusCode)
+            #print('status-code: ', statusCode)
             if len(paramList) == 0:
                 return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
-            print('after statistics')
+            #print('after statistics')
             return render_template('spcHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -217,23 +217,23 @@ def spcHistorical(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "conair":
-        print("INSIDE CONAIR-HISTORICAL")
+        #print("INSIDE CONAIR-HISTORICAL")
         machineID = request.args.get('machineID')
         fieldID = request.args.get('fieldID')
         envparameter = request.args.get('envparameter')
         noCL = request.args.get('noCL')
         starttime = addSingleQuote(starttime)
         endtime = addSingleQuote(endtime)
-        print("MACHINEID:", machineID)
-        print("starttime:", starttime)
-        print("endtime:", endtime)
+        #print("MACHINEID:", machineID)
+        #print("starttime:", starttime)
+        #print("endtime:", endtime)
         statusCode, paramList, dateList = conairapi.conair_historical(machineID, fieldID, starttime, endtime)
         if (statusCode == 200):
-            print('status-code: ', statusCode)
+            #print('status-code: ', statusCode)
             if len(paramList) == 0:
                 return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
-            print('after statistics')
+            #print('after statistics')
             return render_template('spcHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -253,22 +253,22 @@ def spcHistorical(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "cda":
-        print("INSIDE CDA-HISTORICAL")
+        #print("INSIDE CDA-HISTORICAL")
         cdaID = request.args.get('cdaID')
         fieldID = request.args.get('fieldID')
         envparameter = request.args.get('envparameter')
         noCL = request.args.get('noCL')
         starttime = addSingleQuote(starttime)
         endtime = addSingleQuote(endtime)
-        print("starttime:", starttime)
-        print("endtime:", endtime)
+        #print("starttime:", starttime)
+        #print("endtime:", endtime)
         statusCode, paramList, dateList = cdaapi.cda_historical(cdaID, fieldID, starttime, endtime)
         if (statusCode == 200):
-            print('status-code: ', statusCode)
+            #print('status-code: ', statusCode)
             if len(paramList) == 0:
                 return render_template('DataNotFound.html')
             StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
-            print('after statistics')
+            #print('after statistics')
             return render_template('spcHistorical.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -306,7 +306,7 @@ def spcLive(machinename):
     freq = request.args.get('freq')
     #get-data
     if machinename == "envdata":
-        print("LIVE-ENVDATA")
+        #print("LIVE-ENVDATA")
         envparameter = request.args.get('envparameter')  # humidity or temperature
         noCL = request.args.get('noCL')
         statusCode, tempList, humList, dateList = externalrestapiApp.env_live(int(duration))
@@ -376,7 +376,7 @@ def spcLive(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "moldmaster":
-        print("INSIDE MOLDMASTERLIVE")
+        #print("INSIDE MOLDMASTERLIVE")
         machineID = request.args.get('machineID')
         tipID = request.args.get('tipID')
         fieldID = request.args.get('fieldID')
@@ -385,7 +385,7 @@ def spcLive(machinename):
         noCL = request.args.get('noCL')
         statusCode, paramList, dateList = moldmasterapi.moldmaster_live(machineID, tipID, fieldID, duration)
         if (statusCode == 200):
-            print('status-code:', statusCode)
+            #print('status-code:', statusCode)
             return render_template('spcLive.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -408,7 +408,7 @@ def spcLive(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "mouldflo":
-        print("INSIDE MOULDFLO-LIVE")
+        #print("INSIDE MOULDFLO-LIVE")
         machineID = request.args.get('machineID')
         manifoldID = request.args.get('manifoldID')
         channelID = request.args.get('channelID')
@@ -418,7 +418,7 @@ def spcLive(machinename):
         noCL = request.args.get('noCL')
         statusCode, paramList, dateList = mouldfloapi.mouldflo_live(machineID, manifoldID, channelID, fieldID, duration)
         if (statusCode == 200):
-            print('status-code:', statusCode)
+            #print('status-code:', statusCode)
             return render_template('spcLive.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -442,7 +442,7 @@ def spcLive(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "motan":
-        print("INSIDE MOTAN-LIVE")
+        #print("INSIDE MOTAN-LIVE")
         machineID = request.args.get('machineID')
         fieldID = request.args.get('fieldID')
         envparameter = request.args.get('envparameter')
@@ -450,7 +450,7 @@ def spcLive(machinename):
         noCL = request.args.get('noCL')
         statusCode, paramList, dateList = motanapi.motan_live(machineID, fieldID, duration)
         if (statusCode == 200):
-            print('status-code:', statusCode)
+            #print('status-code:', statusCode)
             return render_template('spcLive.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -472,7 +472,7 @@ def spcLive(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "conair":
-        print("INSIDE CONAIR-LIVE")
+        #print("INSIDE CONAIR-LIVE")
         machineID = request.args.get('machineID')
         fieldID = request.args.get('fieldID')
         envparameter = request.args.get('envparameter')
@@ -480,7 +480,7 @@ def spcLive(machinename):
         noCL = request.args.get('noCL')
         statusCode, paramList, dateList = conairapi.conair_live(machineID, fieldID, duration)
         if (statusCode == 200):
-            print('status-code:', statusCode)
+            #print('status-code:', statusCode)
             return render_template('spcLive.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -502,7 +502,7 @@ def spcLive(machinename):
         else:
             return render_template('tableNotFound.html')
     elif machinename == "cda":
-        print("INSIDE CDA-LIVE")
+        #print("INSIDE CDA-LIVE")
         cdaID = request.args.get('cdaID')
         fieldID = request.args.get('fieldID')
         envparameter = request.args.get('envparameter')
@@ -510,7 +510,7 @@ def spcLive(machinename):
         noCL = request.args.get('noCL')
         statusCode, paramList, dateList = cdaapi.cda_live(cdaID, fieldID, duration)
         if (statusCode == 200):
-            print('status-code:', statusCode)
+            #print('status-code:', statusCode)
             return render_template('spcLive.html',
                                    dateTime=dateList,
                                    plotParameter=paramList,
@@ -534,9 +534,9 @@ def spcLive(machinename):
 
 @spcApp.route("/<machinename>")
 def default(machinename):
-    print(request.query_string.decode('utf-8'))
+    #print(request.query_string.decode('utf-8'))
     parameters = request.args.getlist("parameters")
-    print("PARAMETERS: ", parameters)
+    #print("PARAMETERS: ", parameters)
     # example: http://127.0.0.1:5000/line/fanuc?title=juniarto&parameters=temperature&parameters=pressure&parameters=torque
     starttime = request.args.get('starttime')
     endtime = request.args.get('endtime')
@@ -545,12 +545,12 @@ def default(machinename):
     freq = request.args.get('freq')
     titlex = request.args.get('titlex')
     titley = request.args.get('titley')
-    print("STARTIME: ", starttime)
-    print("ENDTIME: ", endtime)
-    print("TITLE:", title)
-    print("FREQ:", freq)
+    #print("STARTIME: ", starttime)
+    #print("ENDTIME: ", endtime)
+    #print("TITLE:", title)
+    #print("FREQ:", freq)
     if (lasthours):
-        print("LASTHOURS: ", lasthours)
+        #print("LASTHOURS: ", lasthours)
         resp = restdatageneratorApp.default() #RESPONSE OBJECT
         mystring = resp.response #STRING
         return render_template('spcTorquePowerLastHour.html', response=mystring, title=title, freq=freq)
@@ -560,10 +560,10 @@ def default(machinename):
                                lowerLimit=lowerLimit, setPoint=setPoint)
     elif (machinename == 'fanuc'):
         dateTime, readTorque, readPower, torqueStdDev, powerStdDev, torqueMean, powerMean,xList, yList = readTorquePower('fanuc-torque-power.csv')
-        print("torquestddev: ", torqueStdDev)
-        print("powerstddev: ", powerStdDev )
-        print("torquemean: ", torqueMean)
-        print("powermean: ", powerMean)
+        #print("torquestddev: ", torqueStdDev)
+        #print("powerstddev: ", powerStdDev )
+        #print("torquemean: ", torqueMean)
+        #print("powermean: ", powerMean)
         return render_template('spcTorquePower.html', dateTime=dateTime, readTorque=readTorque, readPower=readPower, torqueStdDev=torqueStdDev, powerStdDev=powerStdDev, torqueMean=torqueMean, powerMean=powerMean, title=title, titlex=titlex, titley=titley,xList=xList, yList=yList, starttime=starttime, endtime=endtime)
     else:
         return render_template('tableNotFound.html')
