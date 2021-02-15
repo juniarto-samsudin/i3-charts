@@ -65,9 +65,13 @@ def readTorquePower(csvfile):
     return dateTime,readTorque,readPower,torqueStdDev,powerStdDev, torqueMean, powerMean, xList, yList
 
 def getStatisticFromList(mylist):
-    theStdDev = math.floor(calcStdDev(mylist))
-    theMean = calcMean(mylist)
-    xNormalDistList, yNormalDistList = genNormalCurve(mylist)
+    new_list = []
+    #convert damned string to float !FUCK YOUR BACKEND!!!!
+    for item in mylist:
+        new_list.append(float(item))
+    theStdDev = math.floor(calcStdDev(new_list))
+    theMean = calcMean(new_list)
+    xNormalDistList, yNormalDistList = genNormalCurve(new_list)
     return theStdDev,theMean,xNormalDistList,yNormalDistList
 
 def calcStdDev(data):
