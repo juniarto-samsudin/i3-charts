@@ -1,3 +1,4 @@
+from analytics import analyticsApp
 from flask import Flask, render_template
 from util import readCsvFile
 from box.boxApp import boxApp
@@ -5,6 +6,7 @@ from line.lineApp import lineApp
 from histogram.histoApp import histoApp
 from base.baseApp import baseApp
 from spc.spcApp import spcApp
+from analytics.analyticsApp import analyticsApp
 from restdatagenerator.restdatageneratorApp import restdatageneratorApp
 from externalrestapi.externalrestapiApp import externalrestapiApp
 from externalrestapi.moldmasterapi import moldmasterapiApp
@@ -27,6 +29,7 @@ app.register_blueprint(mouldfloapiApp,url_prefix="/mouldfloapi")
 app.register_blueprint(motanapiApp,url_prefix="/motanapi")
 app.register_blueprint(conairapiApp,url_prefix="/conairapi")
 app.register_blueprint(cdaapiApp, url_prefix="/cdaapi")
+app.register_blueprint(analyticsApp, url_prefix="/analytics")
 
 try:
     #GET FROM EXTERNAL ENV VARIABLE SETTINGS
