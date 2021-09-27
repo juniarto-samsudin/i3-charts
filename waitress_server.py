@@ -12,6 +12,7 @@ from externalrestapi.mouldfloapi import mouldfloapiApp
 from externalrestapi.motanapi import motanapiApp
 from externalrestapi.conairapi import conairapiApp
 from externalrestapi.cdaapi import cdaapiApp
+from externalrestapi.predapi import predapiApp
 
 from waitress import serve
 
@@ -29,6 +30,7 @@ app.register_blueprint(mouldfloapiApp,url_prefix="/mouldfloapi")
 app.register_blueprint(motanapiApp,url_prefix="/motanapi")
 app.register_blueprint(conairapiApp,url_prefix="/conairapi")
 app.register_blueprint(cdaapiApp, url_prefix="/cdaapi")
+app.register_blueprint(predapiApp, url_prefix='/predapi')
 
 try:
     #GET FROM EXTERNAL ENV VARIABLE SETTINGS
