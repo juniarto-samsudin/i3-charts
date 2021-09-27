@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from spc.util import readCsvFile, readTorquePower, getStatisticFromList, addSingleQuote
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp, moldmasterapi, mouldfloapi, motanapi, conairapi, cdaapi
+from externalrestapi import externalrestapiApp, moldmasterapi, mouldfloapi, motanapi, conairapi, cdaapi, predapi
 
 spcApp = Blueprint("spcApplication", __name__, static_folder="static", template_folder="templates")
 
@@ -523,6 +523,38 @@ def spcLive(machinename):
                                    envparameter=envparameter,
                                    machinename=machinename,
                                    cdaID = cdaID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "predict":
+        print("INSIDE SPCAPP-PRED-LIVE")
+        print("MACHINE_NAME: ", machinename)
+        machineID = request.args.get('machineID')
+        #fieldID = request.args.get('fieldID')
+        fieldID = 0
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList =  predapi.pred_live(machineID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('spcLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
                                    fieldID=fieldID,
                                    duration=duration,
                                    noCL=noCL

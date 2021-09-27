@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request
 from histogram.util import readCsvFile, readTorquePower, addSingleQuote
 from spc.util import getStatisticFromList
 from restdatagenerator import restdatageneratorApp
-from externalrestapi import externalrestapiApp, moldmasterapi, mouldfloapi, motanapi, conairapi, cdaapi
+from externalrestapi import externalrestapiApp, moldmasterapi, mouldfloapi, motanapi, conairapi, cdaapi, predapi
 
 histoApp = Blueprint("histoApplication", __name__, static_folder="static", template_folder="templates")
 
@@ -227,6 +227,7 @@ def histoHistorical(machinename):
 @histoApp.route("/live/<machinename>")
 def histoLive(machinename):
     # parameters
+    print('INSIDE HISTOLIVE')
     duration = request.args.get('duration')
     xlabel = request.args.get('xlabel')
     ylabel = request.args.get('ylabel')
@@ -452,6 +453,37 @@ def histoLive(machinename):
                                    envparameter=envparameter,
                                    machinename=machinename,
                                    cdaID=cdaID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
+    elif machinename == "predict":
+        print("INSIDE HISTOGRAM-PREDICT-LIVE")
+        machineID = request.args.get('machineID')
+        #fieldID = request.args.get('fieldID')
+        fieldID = 0
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = predapi.pred_live(machineID, duration)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('histoLive.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   freq=freq,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
                                    fieldID=fieldID,
                                    duration=duration,
                                    noCL=noCL

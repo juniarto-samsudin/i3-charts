@@ -33,6 +33,8 @@
         {% elif machinename == 'cda' %}
             cdaID = "{{ cdaID|safe }}"
             fieldID = "{{ fieldID|safe }}"
+        {% elif machinename == 'predict' %}
+            fieldID = "{{ fieldID|safe }}"
         {% endif %}
 
         {% if sp != none %}
@@ -199,8 +201,8 @@
         function reRender(){
             {#myurl={{ url_for('restdatageneratorApplication.default') }}
             <a href = {{ url_for('find_question' ,question_id=1) }}>Question 1</a>#}
-            //console.log("INSIDE RERENDER")
-            //console.log("MACHINENAME: ", machinename)
+            console.log("INSIDE RERENDER")
+            console.log("MACHINENAME: ", machinename)
             //console.log("DURATION: ", duration)
             var myurl
             switch(machinename){
@@ -224,6 +226,9 @@
                     break
                 case "cda":
                     myurl = "{{ url_for('cdaapiApplication.cda_live_json', cdaID=cdaID, fieldID=fieldID, duration=duration)}}"
+                    break
+                case "predict":
+                    myurl = "{{ url_for('predapiApplication.pred_live_json',machineID=machineID, duration=duration) }}"
                     break
                 default:
             }
@@ -277,6 +282,12 @@
                     plotParameter = jsondata[0]
                     x = jsondata[1]
                     //console.log("CDA")
+                    //console.log("STATUS: ", xhr.status)
+                }
+                else if(machinename == "predict"){
+                    plotParameter = jsondata[0]
+                    x = jsondata[1]
+                    //console.log("MOTAN")
                     //console.log("STATUS: ", xhr.status)
                 }
                 //console.log("TYPE OF X", typeof x)
