@@ -20,6 +20,7 @@ class Config(object):
     CDA_API_URL_HISTORICAL = "https://i3.zapto.org/bdm01/getCDADataByTime.php"
     CDA_API_URL_LIVE = "https://i3.zapto.org/bdm01/getCDADataByDuration.php"
     PRED_API_URL_LIVE = "https://i3.zapto.org/bdm01/getPredictiveResByDuration.php"
+    PRED_API_URL_HISTORICAL = "https://i3.zapto.org:443/bdm01/getPredictiveResByTime.php"
 
 class ProductionConfig(Config):
     pass

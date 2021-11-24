@@ -5,6 +5,7 @@
     <div id="myDiv"></div>
     <script>
         ROOT = document.getElementById("myDiv")
+        machinename = "{{ machinename|safe }}"
         x = {{ dateTime | safe }}
         plotParameter = {{ plotParameter|safe }}
         title = {{ title|safe|tojson }}
@@ -83,7 +84,80 @@
         }
 
 
-
+        {% if machinename == "predict" %}
+        var layout = {
+            title: title,
+            showlegend: true,
+            annotations:[
+                    {
+                        x: x[0],
+                        y: 1,
+                        xref: 'x',
+                        yref: 'y',
+                        text: 'GOOD',
+                        showarrow:false,
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 16,
+                            color: '#ffffff'
+                          },
+                          align: 'center',
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 2,
+                        arrowcolor: '#636363',
+                        ax: 20,
+                        ay: -30,
+                        bordercolor: '#c7c7c7',
+                        borderwidth: 2,
+                        borderpad: 4,
+                        bgcolor: '#ff7f0e',
+                        opacity: 0.8    
+                    },
+                    {
+                        x: x[0],
+                        y: 0,
+                        xref: 'x',
+                        yref: 'y',
+                        text: 'BAD',
+                        showarrow:false,
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 16,
+                            color: '#ffffff'
+                          },
+                          align: 'center',
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 2,
+                        arrowcolor: '#636363',
+                        ax: 20,
+                        ay: -30,
+                        bordercolor: '#c7c7c7',
+                        borderwidth: 2,
+                        borderpad: 4,
+                        bgcolor: '#ff7f0e',
+                        opacity: 0.8    
+                    }
+                ],
+            legend:{
+                   x: 0.5,
+                   y: -0.8
+            },
+            yaxis:{
+                title: ylabel,
+                autorange: true,
+                type: 'linear',
+                showline: showline = true,
+                showgrid: showgrid = true,
+                nticks: nticks =6
+            },
+            xaxis:{
+                title: "Time",
+                showline: showline = true
+            }
+}
+        {% else %}
 var layout = {
             title: title,
             showlegend: true,
@@ -104,7 +178,8 @@ var layout = {
                 showline: showline = true
             }
 }
-
+        {% endif %}
+       
 var config = {responsive: true, displaylogo:false}
 Plotly.newPlot(ROOT, data, layout, config)
 

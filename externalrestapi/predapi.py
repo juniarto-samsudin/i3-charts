@@ -50,6 +50,33 @@ def pred_live_json(machineID, duration):
             data=paramList, timeList
             return response(data, 404)
 
+@predapiApp.route("/predhistorical")
+def pred_historical(machineID, starttime, endtime):
+    API_URL = current_app.config['PRED_API_URL_HISTORICAL']
+    print("INSIDE PRED HISTORICAL: ", API_URL)
+    print('MACHINE ID: ', machineID)
+    print('STARTTIME: ', starttime)
+    print('END TIME: ', endtime)
+    try:
+        r = requests.post(API_URL, data={
+            'machineID': machineID,
+            'startdate': starttime,
+            'enddate': endtime
+        }, verify=False)
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.RequestException) as err:
+        paramList=[]
+        timeList=[]
+        status_code=999
+        return status_code, paramList, timeList
+    else:
+        if (r.status_code == 200):
+            paramList, timeList = processPredData(r.content)
+            return r.status_code, paramList, timeList
+        else:
+            paramList = []
+            timeList = []
+            return r.status_code, paramList, timeList
+
 def processPredData(jsonString):
     '''
     [[{"date":"2021-05-24 15:27:30.000000","timezone_type":3,"timezone":"UTC"},"1"],[{"date":"2021-05-24

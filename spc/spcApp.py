@@ -287,6 +287,45 @@ def spcHistorical(machinename):
             return render_template('ConnectionError.html')
         else:
             return render_template('tableNotFound.html')
+    elif machinename == "predict":
+        print("INSIDE SPCAPP-PRED-HISTORICAL")
+        print('MACHINE_NAME: ', machinename)
+        machineID = request.args.get('machineID')
+        #starttime = addSingleQuote(starttime)
+        #endtime = addSingleQuote(endtime)
+
+        fieldID = 0
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList =  predapi.pred_historical(machineID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code: ', statusCode)
+            if len(paramList) == 0:
+                return render_template('DataNotFound.html')
+            StdDev, Mean, xNormDistList, yNormDistList = getStatisticFromList(paramList)
+            #print('after statistics')
+            return render_template('spcHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   StdDev=StdDev,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   xNormalDistList=xNormDistList,
+                                   yNormalDistList=yNormDistList,
+                                   envparameter=envparameter,
+                                   noCL=noCL,
+                                   machinename=machinename
+                                   )
+        elif(statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            print('STATUSCODE: ', statusCode)
+            return render_template('tableNotFound.html')    
+
 '''
 ╦  ╦╦  ╦╔═╗
 ║  ║╚╗╔╝║╣ 

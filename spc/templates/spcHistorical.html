@@ -5,6 +5,7 @@
     <div id="myDiv"></div>
     <script>
         ROOT = document.getElementById("myDiv")
+        machinename = "{{ machinename|safe }}"
         x = {{ dateTime | safe }}
         plotParameter = {{ plotParameter|safe }}
         envparameter = "{{ envparameter|safe }}"
@@ -136,7 +137,112 @@
             showgrid: showgrid = true,
             nticks: nticks = 20
         }
-
+        {% if machinename == "predict" %}
+        var layout = {
+            title: title,
+            showlegend: true,
+            annotations:[
+                    {
+                        x: x[0],
+                        y: 1,
+                        xref: 'x',
+                        yref: 'y',
+                        text: 'GOOD',
+                        showarrow:false,
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 16,
+                            color: '#ffffff'
+                          },
+                          align: 'center',
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 2,
+                        arrowcolor: '#636363',
+                        ax: 20,
+                        ay: -30,
+                        bordercolor: '#c7c7c7',
+                        borderwidth: 2,
+                        borderpad: 4,
+                        bgcolor: '#ff7f0e',
+                        opacity: 0.8  
+                    },
+                    {
+                        x: x[0],
+                        y: 0,
+                        xref: 'x',
+                        yref: 'y',
+                        text: 'BAD',
+                        showarrow:false,
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 16,
+                            color: '#ffffff'
+                          },
+                          align: 'center',
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 2,
+                        arrowcolor: '#636363',
+                        ax: 20,
+                        ay: -30,
+                        bordercolor: '#c7c7c7',
+                        borderwidth: 2,
+                        borderpad: 4,
+                        bgcolor: '#ff7f0e',
+                        opacity: 0.8    
+                    }
+                ],
+            legend:{
+                   x: 0.5,
+                   y: -0.8 
+            },
+            //SCATTER
+            xaxis: {
+                title: "Time",
+                domain: [0, 0.7], // 0 to 70% of width
+                zeroline: false,
+                showline: showline = true
+            },
+            yaxis: {
+                title: ylabel,
+                autorange: true,
+                //range: [0,50],
+                zeroline: false,
+                showline: showline = true
+            },
+            //HISTOGRAM
+            xaxis2: {
+                domain: [0.8, 1], // 70 to 100% of width
+                showline: showline = true,
+                title: "Frequency"
+                //overlaying: 'y'
+            },
+            yaxis2: {
+                anchor: 'x2',
+                showline:showline = false,
+                title: ylabel,
+                //showticklabels: true,
+                //overlaying: 'y'
+            },
+            xaxis3:{
+                domain:[0.8, 1],
+                overlaying: 'x2',
+                autorange: true,
+                side: 'top',
+                showline: showline = true,
+                showgrid: showgrid = false,
+                title: "Normal Distribution"
+            },
+            yaxis3:{
+                anchor:'x3',
+                showticklabels: true,
+                overlaying: 'y2',
+                autorange: true,
+                side: 'right'
+            }
+        }
+        {% else %}
         var layout = {
             title: title,
             showlegend: true,
@@ -189,6 +295,7 @@
                 side: 'right'
             }
         }
+        {% endif %}
 
         var config = {responsive: true, displaylogo: false}
         Plotly.newPlot(ROOT, data, layout, config)

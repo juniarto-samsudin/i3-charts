@@ -237,6 +237,36 @@ def lineHistorical(machinename):
             return render_template('ConnectionError.html')
         else:
             return render_template('tableNotFound.html')
+    elif machinename == "predict":
+        print("INSIDE LINE-PREDICT-HISTORICAL")
+        machineID = request.args.get('machineID')
+        #fieldID = request.args.get('fieldID')
+        fieldID = 0
+        envparameter = request.args.get('envparameter')
+        duration = request.args.get('duration')
+        noCL = request.args.get('noCL')
+        statusCode, paramList, dateList = predapi.pred_historical(machineID, starttime, endtime)
+        if (statusCode == 200):
+            print('status-code:', statusCode)
+            return render_template('lineHistorical.html',
+                                   dateTime=dateList,
+                                   plotParameter=paramList,
+                                   title=title,
+                                   ylabel=ylabel,
+                                   lcl=lcl,
+                                   ucl=ucl,
+                                   sp=sp,
+                                   envparameter=envparameter,
+                                   machinename=machinename,
+                                   machineID=machineID,
+                                   fieldID=fieldID,
+                                   duration=duration,
+                                   noCL=noCL
+                                   )
+        elif (statusCode == 999):
+            return render_template('ConnectionError.html')
+        else:
+            return render_template('tableNotFound.html')
 
 '''
 ╦  ╦╦  ╦╔═╗
